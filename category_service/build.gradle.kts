@@ -4,6 +4,8 @@ plugins {
     id("java")
     id("org.springframework.boot") version "3.1.5"
     id("io.spring.dependency-management") version "1.1.3"
+    id("org.springdoc.openapi-gradle-plugin") version "1.8.0"
+
 }
 
 group = "org.example"
@@ -26,10 +28,14 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+
 
     implementation(project(":shared"))
 
