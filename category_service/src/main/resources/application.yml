@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: category_service
+
+  jpa:
+    generate-ddl: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/category_service?ApplicationName=Category_Service
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: app
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL:
+          DEBUG
+        orm:
+          jdbc:
+            bind:
+              Trace
+
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
