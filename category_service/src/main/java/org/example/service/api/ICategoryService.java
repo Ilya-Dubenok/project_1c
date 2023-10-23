@@ -8,6 +8,7 @@ import org.example.entities.RuleType;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public interface ICategoryService {
 
     Page<Category> getPage(Integer currentRequestedPage, Integer rowsPerPage);
 
-    List<Category> findCategoryForRules(UUID startCategoryId, Set<RuleType> types);
+    Map<RuleType, Category> findCategoriesForRules(UUID startCategoryId, Set<RuleType> types);
 
     Category updateNameAndRules(UUID uuid, @Valid CategoryUpdateDTO categoryUpdateDTO);
 

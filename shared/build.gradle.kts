@@ -28,13 +28,14 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.3")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 }
 
+tasks.bootJar{
+    this.isEnabled = false
+
+}
 
 tasks.test {
     useJUnitPlatform()
-}
-
-tasks.withType<BootJar>(){
-    archiveFileName.set("${project.name}.jar")
 }
