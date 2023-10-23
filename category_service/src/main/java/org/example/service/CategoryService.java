@@ -110,13 +110,6 @@ public class CategoryService implements ICategoryService {
             throw new GeneralException(NO_CATEGORY_FOUND_MESSAGE);
         }
 
-//        List<Category> listOfChildren = categoryRepository.findByParent_UuidEquals(uuid);
-//
-//        if (listOfChildren.size() > 0) {
-//            throw new GeneralException("this category has sub-categories. delete them first");
-//        }
-
-
         categoryRepository.deleteById(uuid);
 
 
