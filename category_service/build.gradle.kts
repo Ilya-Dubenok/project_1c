@@ -25,9 +25,13 @@ repositories {
     mavenCentral()
 }
 
+extra["springCloudVersion"] = "2022.0.4"
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.google.guava:guava:11.0.2")
     implementation("org.modelmapper:modelmapper:3.2.0")
@@ -41,6 +45,12 @@ dependencies {
 
     implementation(project(":shared"))
 
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+    }
 }
 
 
