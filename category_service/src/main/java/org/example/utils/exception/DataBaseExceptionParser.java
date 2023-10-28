@@ -15,24 +15,26 @@ public class DataBaseExceptionParser {
 
     public boolean fillIfExceptionRecognized(Throwable cause, InternalExceptionDTO internalExceptionDTO) {
 
-        if (cause instanceof ConstraintViolationException) {
-            String constraintName = ((ConstraintViolationException) cause).getConstraintName();
-            ConstraintMapper constraint = findProperConstraint(constraintName);
-
-            if (constraint != null) {
-                internalExceptionDTO.setMessage(constraint.getErrorMessage());
-                return true;
-            }
-            return false;
-
-        }  else {
-            Throwable innerCause = cause.getCause();
-            if (innerCause == null || innerCause == cause) {
+        boolean innerCauseIsNotLast = true;
+        while (innerCauseIsNotLast) {
+            if (cause instanceof ConstraintViolationException) {
+                String constraintName = ((ConstraintViolationException) cause).getConstraintName();
+                ConstraintMapper constraint = findProperConstraint(constraintName);
+                if (constraint != null) {
+                    internalExceptionDTO.setMessage(constraint.getErrorMessage());
+                    return true;
+                }
                 return false;
-            }
-            return fillIfExceptionRecognized(innerCause, internalExceptionDTO);
-        }
 
+            }  else {
+                Throwable innerCause = cause.getCause();
+                if (innerCause == null || innerCause == cause) {
+                    innerCauseIsNotLast = false;
+                }
+                cause = innerCause;
+            }
+        }
+        return false;
     }
 
     private ConstraintMapper findProperConstraint(String constraintName) {
