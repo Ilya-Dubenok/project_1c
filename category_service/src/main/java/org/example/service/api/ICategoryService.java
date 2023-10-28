@@ -1,6 +1,5 @@
 package org.example.service.api;
 
-import jakarta.validation.Valid;
 import org.example.core.dto.category.CategoryCreateDTO;
 import org.example.core.dto.category.CategoryDTO;
 import org.example.core.dto.category.CategoryUpdateDTO;
