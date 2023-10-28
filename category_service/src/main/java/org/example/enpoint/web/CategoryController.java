@@ -19,6 +19,8 @@ import org.example.core.exception.dto.InternalExceptionDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -83,17 +85,8 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)})
     @GetMapping
-    public ResponseEntity<PageDTO<CategoryDTO>> getPage(@RequestParam(value = "page", defaultValue = "0") Integer page,
-                                                        @RequestParam(value = "size", defaultValue = "20") Integer size) {
-
-        Page<Category> categoryPage = categoryService.getPage(page, size);
-
-        Type pageDTOType = new TypeToken<PageDTO<CategoryDTO>>() {}.getType();
-
-        PageDTO<CategoryDTO> res = mapper.map(categoryPage, pageDTOType);
-
-        return new ResponseEntity<>(res, HttpStatus.OK);
-
+    public Page<CategoryDTO> getPage(@PageableDefault(size = 20, sort = {"name"}) Pageable pageable) {
+        return categoryService.getPage(pageable);
     }
 
     @Operation(summary = "update name and/or rules for categories")

@@ -1,7 +1,9 @@
 package org.example.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.core.dto.PageDTO;
 import org.example.core.dto.category.CategoryCreateDTO;
+import org.example.core.dto.category.CategoryDTO;
 import org.example.core.dto.category.CategoryUpdateDTO;
 import org.example.core.exception.InternalException;
 import org.example.dao.entities.Category;
@@ -14,12 +16,14 @@ import org.example.dao.entities.IRule;
 import org.example.dao.entities.QuantityRule;
 import org.example.dao.entities.RuleType;
 import org.example.service.api.ICategoryService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 @Service
@@ -30,6 +34,9 @@ public class CategoryService implements ICategoryService {
     private static final String NO_CATEGORY_FOUND_MESSAGE = "no category for the provided uuid found";
 
     private final ICategoryRepository categoryRepository;
+
+    private final ModelMapper mapper;
+
 
     @Override
     public Category save(CategoryCreateDTO categoryCreateDTO) {
@@ -63,15 +70,9 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public Page<Category> getPage(Integer currentRequestedPage, Integer rowsPerPage) {
-
-        if (currentRequestedPage < 0 || rowsPerPage < 1) {
-            throw new InternalException("page number must not be less than 0 and total values must no be less than 1");
-        }
-
-        return categoryRepository.findAll(
-                PageRequest.of(currentRequestedPage,rowsPerPage, Sort.by("name"))
-        );
+    public Page<CategoryDTO> getPage(Pageable pageable) {
+        Page<Category> pageOfCategories = categoryRepository.findAll(pageable);
+        return pageOfCategories.map(category -> mapper.map(category, CategoryDTO.class));
     }
 
     @Override
