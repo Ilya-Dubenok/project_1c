@@ -18,7 +18,6 @@ public class CategoryDTO {
 
     private String name;
 
-    @JsonProperty(value = "parent_uuid")
     private UUID parentUuid;
 
     private List<RuleCreateDTO> rules;

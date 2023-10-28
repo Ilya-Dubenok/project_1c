@@ -1,7 +1,6 @@
 package org.example.core.dto.rule;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,6 @@ public class ExpirationRuleDTO extends ExpirationRuleCreateDTO {
 
     private UUID uuid;
 
-    @JsonProperty("rule_type")
     private RuleType ruleType = RuleType.EXP;
 
 

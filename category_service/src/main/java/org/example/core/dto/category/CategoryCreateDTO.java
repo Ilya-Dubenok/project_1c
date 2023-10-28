@@ -1,6 +1,5 @@
 package org.example.core.dto.category;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -19,7 +18,6 @@ public class CategoryCreateDTO {
     @NotBlank(message = "must not be null o blank")
     private String name;
 
-    @JsonProperty("parent_uuid")
     private UUID parentUuid;
 
     @Valid
