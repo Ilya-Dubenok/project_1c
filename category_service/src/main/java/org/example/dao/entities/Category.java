@@ -6,9 +6,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.entities.ExpirationRule;
-import org.example.entities.IRule;
-import org.example.entities.QuantityRule;
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;
 

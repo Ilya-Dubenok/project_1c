@@ -1,4 +1,4 @@
-package org.example.dto.page;
+package org.example.core.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

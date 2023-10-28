@@ -13,7 +13,7 @@ import org.example.core.dto.CategoryDTO;
 import org.example.core.dto.CategoryUpdateDTO;
 import org.example.core.exception.dto.StructuredExceptionDTO;
 import org.example.dao.entities.Category;
-import org.example.dto.page.PageDTO;
+import org.example.core.dto.PageDTO;
 import org.example.service.api.ICategoryService;
 import org.example.utils.exception.GeneralExceptionDTO;
 import org.modelmapper.ModelMapper;

@@ -1,4 +1,4 @@
-package org.example.entities;
+package org.example.dao.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

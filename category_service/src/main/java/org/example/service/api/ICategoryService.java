@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import org.example.core.dto.CategoryCreateDTO;
 import org.example.core.dto.CategoryUpdateDTO;
 import org.example.dao.entities.Category;
-import org.example.entities.RuleType;
+import org.example.dao.entities.RuleType;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

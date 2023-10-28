@@ -1,11 +1,11 @@
 package org.example.config;
 
 import org.example.dao.entities.Category;
-import org.example.dto.rule.ExpirationRuleDTO;
-import org.example.dto.rule.RuleCreateDTO;
-import org.example.dto.rule.QuantityRuleDTO;
-import org.example.entities.ExpirationRule;
-import org.example.entities.QuantityRule;
+import org.example.core.dto.rule.ExpirationRuleDTO;
+import org.example.core.dto.rule.RuleCreateDTO;
+import org.example.core.dto.rule.QuantityRuleDTO;
+import org.example.dao.entities.ExpirationRule;
+import org.example.dao.entities.QuantityRule;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

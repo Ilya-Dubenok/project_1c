@@ -39,12 +39,7 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
-
-
-    implementation(project(":shared"))
-
 }
 
 dependencyManagement {

@@ -1,4 +1,4 @@
-package org.example.dto.rule;
+package org.example.core.dto.rule;
 
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
