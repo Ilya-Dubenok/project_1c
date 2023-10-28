@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public interface ICategoryService {
 
-    Category save(@Valid CategoryCreateDTO categoryCreateDTO);
+    Category save(CategoryCreateDTO categoryCreateDTO);
 
     Category findByUUID(UUID uuid);
 
@@ -26,7 +26,7 @@ public interface ICategoryService {
 
     Map<RuleType, Category> findCategoriesForRules(UUID startCategoryId, Set<RuleType> types);
 
-    Category updateNameAndRules(UUID uuid, @Valid CategoryUpdateDTO categoryUpdateDTO);
+    Category updateNameAndRules(UUID uuid, CategoryUpdateDTO categoryUpdateDTO);
 
     void delete(UUID uuid);
 

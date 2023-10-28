@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CategoryCreateDTO {
 
-    @NotBlank(message = "name must not be null o blank")
+    @NotBlank(message = "must not be null o blank")
     private String name;
 
     @JsonProperty("parent_uuid")

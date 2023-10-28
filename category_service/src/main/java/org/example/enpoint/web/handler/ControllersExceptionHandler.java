@@ -16,12 +16,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @ControllerAdvice
 @RequiredArgsConstructor
@@ -56,6 +61,22 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
         }
     }
 
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        if (fieldErrors.size() > 0) {
+            Map<String, String> fieldAndDescripionMap = new HashMap<>();
+            for (FieldError error : fieldErrors) {
+                fieldAndDescripionMap.put(error.getField(), error.getDefaultMessage());
+            }
+            StructuredExceptionDTO structuredExceptionDTO = new StructuredExceptionDTO();
+            structuredExceptionDTO.setPayload(fieldAndDescripionMap);
+            return new ResponseEntity<>(structuredExceptionDTO, HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<>(new InternalExceptionDTO("invalid input data"), HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -63,7 +84,6 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
         String propertyName = ex.getPropertyName();
 
         String message = propertyName + " is malformed";
-
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 

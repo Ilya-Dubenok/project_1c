@@ -7,29 +7,29 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.core.dto.category.CategoryCreateDTO;
 import org.example.core.dto.category.CategoryDTO;
 import org.example.core.dto.category.CategoryUpdateDTO;
 import org.example.core.exception.dto.StructuredExceptionDTO;
 import org.example.dao.entities.Category;
-import org.example.core.dto.PageDTO;
 import org.example.service.api.ICategoryService;
 import org.example.core.exception.dto.InternalExceptionDTO;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Type;
 import java.util.UUID;
 
 @Tag(name = "Category")
 @RequiredArgsConstructor
+@Validated
 @RestController
 @RequestMapping(value = "/category")
 public class CategoryController {
@@ -49,7 +49,7 @@ public class CategoryController {
                             oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
             )})
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CategoryCreateDTO categoryCreateDTO) {
+    public ResponseEntity<?> create(@Valid @RequestBody CategoryCreateDTO categoryCreateDTO) {
         categoryService.save(categoryCreateDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -97,7 +97,7 @@ public class CategoryController {
                             oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
             )})
     @PutMapping(value = "/{uuid}")
-    public ResponseEntity<?> update(@PathVariable UUID uuid, @RequestBody CategoryUpdateDTO categoryUpdateDTO) {
+    public ResponseEntity<?> update(@PathVariable UUID uuid, @Valid @RequestBody CategoryUpdateDTO categoryUpdateDTO) {
 
         categoryService.updateNameAndRules(uuid, categoryUpdateDTO);
 
@@ -114,7 +114,6 @@ public class CategoryController {
             )})
     @DeleteMapping(value = "/{uuid}")
     public ResponseEntity<?> delete(@PathVariable UUID uuid) {
-
         categoryService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
