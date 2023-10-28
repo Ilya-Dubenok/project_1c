@@ -22,14 +22,14 @@ import java.util.UUID;
 public class Category {
 
     @Id
-    @Column(name = "category_id")
+    @Column(name = "id")
     private UUID uuid;
 
     @Column(nullable = false)
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "parent_id", referencedColumnName = "category_id", foreignKey = @ForeignKey(name = "fk_category_parent"))
+    @JoinColumn(name = "parent_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_category_parent"))
     private Category parent;
 
     @ManyToAny

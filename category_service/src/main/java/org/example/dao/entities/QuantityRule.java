@@ -15,11 +15,12 @@ import java.util.UUID;
 public class QuantityRule implements IRule{
 
     @Id
+    @Column(name= "id")
     private UUID uuid;
 
     private Integer minimumQuantity;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private RuleType ruleType = RuleType.QUANT;
 
     public QuantityRule(UUID uuid, Integer minimumQuantity) {

@@ -16,11 +16,12 @@ import java.util.UUID;
 public class ExpirationRule implements IRule {
 
     @Id
+    @Column(name= "id")
     private UUID uuid;
 
     private Integer daysTillExpiration;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private RuleType ruleType = RuleType.EXP;
 
     public ExpirationRule(UUID uuid, Integer daysTillExpiration) {
