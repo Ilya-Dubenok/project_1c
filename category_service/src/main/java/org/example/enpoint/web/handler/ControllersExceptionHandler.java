@@ -4,9 +4,9 @@ import com.google.common.base.CaseFormat;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
-import org.example.core.exception.GeneralException;
-import org.example.utils.exception.DataBaseExceptionsHandler;
-import org.example.utils.exception.GeneralExceptionDTO;
+import org.example.core.exception.InternalException;
+import org.example.utils.exception.DataBaseExceptionParser;
+import org.example.core.exception.dto.InternalExceptionDTO;
 import org.example.core.exception.dto.StructuredExceptionDTO;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,23 +25,20 @@ import java.util.Iterator;
 @ControllerAdvice
 public class ControllersExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private DataBaseExceptionsHandler dataBaseExceptionsHandler;
+    private DataBaseExceptionParser dataBaseExceptionParser;
 
-
-    public ControllersExceptionHandler(DataBaseExceptionsHandler dataBaseExceptionsHandler) {
-        this.dataBaseExceptionsHandler = dataBaseExceptionsHandler;
+    public ControllersExceptionHandler(DataBaseExceptionParser dataBaseExceptionParser) {
+        this.dataBaseExceptionParser = dataBaseExceptionParser;
     }
 
-
-    @ExceptionHandler(value = GeneralException.class)
-    protected ResponseEntity<Object> handleGeneralException(GeneralException e, WebRequest request) {
-        GeneralExceptionDTO exceptionDTO = new GeneralExceptionDTO(e.getMessage());
+    @ExceptionHandler(value = InternalException.class)
+    protected ResponseEntity<Object> handleGeneralException(InternalException e, WebRequest request) {
+        InternalExceptionDTO exceptionDTO = new InternalExceptionDTO(e.getMessage());
         return new ResponseEntity<>(exceptionDTO, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = ConstraintViolationException.class)
     protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e, WebRequest request) {
-
 
         StructuredExceptionDTO structuredExceptionDTO = new StructuredExceptionDTO();
 
@@ -53,15 +50,12 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
     @ExceptionHandler(value = DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException e, WebRequest request) {
 
-        GeneralExceptionDTO generalExceptionToFill = new GeneralExceptionDTO();
-        if (dataBaseExceptionsHandler.fillIfExceptionRecognized(e, generalExceptionToFill)) {
-
+        InternalExceptionDTO generalExceptionToFill = new InternalExceptionDTO();
+        if (dataBaseExceptionParser.fillIfExceptionRecognized(e, generalExceptionToFill)) {
             return new ResponseEntity<>(generalExceptionToFill, HttpStatus.BAD_REQUEST);
         } else {
-
             return new ResponseEntity<>("some error occurred during operation", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
 
@@ -73,12 +67,10 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
         String message = propertyName + " is malformed";
 
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-
         return new ResponseEntity<>("HTTP message is malformed", HttpStatus.BAD_REQUEST);
     }
 
@@ -90,9 +82,7 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
             String propname = parseForPropNameInSnakeCase(constraintViolation);
             String message = constraintViolation.getMessage();
             structuredExceptionDTO.getPayload().put(propname, message);
-
         }
-
     }
 
     private String parseForPropNameInSnakeCase(ConstraintViolation<?> next) {
@@ -105,12 +95,7 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
 
         while (iterator.hasNext()) {
             node = iterator.next();
-
         }
         return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, node.getName());
-
-
     }
-
-
 }

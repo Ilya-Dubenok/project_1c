@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class QuantityRuleCreateDTO extends RuleCreateDTO {
 
     @NotNull(message = "must not be null")
-    @Min(value = 0, message = "must be more than 0")
+    @Min(value = 0, message = "must not be less than 0")
     @JsonProperty("minimum_quantity")
     private Integer minimumQuantity;
 

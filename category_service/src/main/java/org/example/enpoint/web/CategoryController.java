@@ -15,7 +15,7 @@ import org.example.core.exception.dto.StructuredExceptionDTO;
 import org.example.dao.entities.Category;
 import org.example.core.dto.PageDTO;
 import org.example.service.api.ICategoryService;
-import org.example.utils.exception.GeneralExceptionDTO;
+import org.example.core.exception.dto.InternalExceptionDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
@@ -44,7 +44,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "400", description = "Some error occurred",
                     content = {@Content(mediaType = "application/json", schema =
                     @Schema(description = "errors messages",
-                            oneOf = {GeneralExceptionDTO.class, StructuredExceptionDTO.class}))}
+                            oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
             )})
     @PostMapping
     public ResponseEntity<?> create(@RequestBody CategoryCreateDTO categoryCreateDTO) {
@@ -59,7 +59,7 @@ public class CategoryController {
                             schema = @Schema(implementation = CategoryDTO.class))}),
             @ApiResponse(responseCode = "400", description = "Invalid id supplied",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = GeneralExceptionDTO.class))}),
+                            schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)})
     @GetMapping("/{uuid}")
@@ -67,18 +67,11 @@ public class CategoryController {
         Category category = categoryService.findByUUID(uuid);
 
         if (null != category) {
-
             CategoryDTO dto = mapper.map(category, CategoryDTO.class);
-
             return new ResponseEntity<>(dto, HttpStatus.OK);
-
         } else {
-
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
         }
-
-
     }
 
     @Operation(summary = "Get page of categories")
@@ -86,7 +79,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "200", description = "Page returned"),
             @ApiResponse(responseCode = "400", description = "Invalid params passed",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = GeneralExceptionDTO.class))}),
+                            schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)})
     @GetMapping
@@ -95,8 +88,7 @@ public class CategoryController {
 
         Page<Category> categoryPage = categoryService.getPage(page, size);
 
-        Type pageDTOType = new TypeToken<PageDTO<CategoryDTO>>() {
-        }.getType();
+        Type pageDTOType = new TypeToken<PageDTO<CategoryDTO>>() {}.getType();
 
         PageDTO<CategoryDTO> res = mapper.map(categoryPage, pageDTOType);
 
@@ -109,7 +101,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "400", description = "Some error occurred",
                     content = {@Content(mediaType = "application/json", schema =
                     @Schema(description = "errors messages",
-                            oneOf = {GeneralExceptionDTO.class, StructuredExceptionDTO.class}))}
+                            oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
             )})
     @PutMapping(value = "/{uuid}")
     public ResponseEntity<?> update(@PathVariable UUID uuid, @RequestBody CategoryUpdateDTO categoryUpdateDTO) {
@@ -125,14 +117,12 @@ public class CategoryController {
             @ApiResponse(responseCode = "400", description = "Some error occurred",
                     content = {@Content(mediaType = "application/json", schema =
                     @Schema(description = "errors messages",
-                            oneOf = {GeneralExceptionDTO.class, StructuredExceptionDTO.class}))}
+                            oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
             )})
     @DeleteMapping(value = "/{uuid}")
     public ResponseEntity<?> delete(@PathVariable UUID uuid) {
 
         categoryService.delete(uuid);
-
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
     }
 }

@@ -3,7 +3,7 @@ package org.example.service;
 import lombok.AllArgsConstructor;
 import org.example.core.dto.CategoryCreateDTO;
 import org.example.core.dto.CategoryUpdateDTO;
-import org.example.core.exception.GeneralException;
+import org.example.core.exception.InternalException;
 import org.example.dao.entities.Category;
 import org.example.dao.repositories.ICategoryRepository;
 import org.example.core.dto.rule.ExpirationRuleCreateDTO;
@@ -37,7 +37,7 @@ public class CategoryService implements ICategoryService {
         String categoryName = categoryCreateDTO.getName();
 
         if (categoryRepository.findByName(categoryName) != null) {
-            throw new GeneralException("This name is already present");
+            throw new InternalException("This name is already present");
         }
 
         UUID parentUuid = categoryCreateDTO.getParentUuid();
@@ -46,7 +46,7 @@ public class CategoryService implements ICategoryService {
 
         if (null != parentUuid) {
             parent = categoryRepository.findById(parentUuid).orElseThrow(
-                    () -> new GeneralException("No category for this parent uuid found")
+                    () -> new InternalException("No category for this parent uuid found")
             );
         }
 
@@ -55,7 +55,6 @@ public class CategoryService implements ICategoryService {
         Category toPersist = new Category(UUID.randomUUID(), categoryName, parent, rules);
 
         return categoryRepository.save(toPersist);
-
     }
 
     @Override
@@ -67,7 +66,7 @@ public class CategoryService implements ICategoryService {
     public Page<Category> getPage(Integer currentRequestedPage, Integer rowsPerPage) {
 
         if (currentRequestedPage < 0 || rowsPerPage < 1) {
-            throw new GeneralException("page number must not be less than 0 and total values must no be less than 1");
+            throw new InternalException("page number must not be less than 0 and total values must no be less than 1");
         }
 
         return categoryRepository.findAll(
@@ -90,7 +89,7 @@ public class CategoryService implements ICategoryService {
     public Category updateNameAndRules(UUID uuid, CategoryUpdateDTO categoryUpdateDTO) {
 
         Category toUpdate = categoryRepository.findById(uuid).orElseThrow(
-                () -> new GeneralException(NO_CATEGORY_FOUND_MESSAGE)
+                () -> new InternalException(NO_CATEGORY_FOUND_MESSAGE)
         );
 
         toUpdate.setName(categoryUpdateDTO.getName());
@@ -100,19 +99,16 @@ public class CategoryService implements ICategoryService {
         toUpdate.setRules(rules);
 
         return categoryRepository.save(toUpdate);
-
     }
 
     @Override
     public void delete(UUID uuid) {
 
         if (!categoryRepository.existsById(uuid)) {
-            throw new GeneralException(NO_CATEGORY_FOUND_MESSAGE);
+            throw new InternalException(NO_CATEGORY_FOUND_MESSAGE);
         }
 
         categoryRepository.deleteById(uuid);
-
-
     }
 
     private List<IRule> createRuleList(List<RuleCreateDTO> rules) {
@@ -124,7 +120,6 @@ public class CategoryService implements ICategoryService {
         List<IRule> res = new ArrayList<>();
 
         List<RuleType> ruleTypesLeft = new ArrayList<>(Arrays.stream(RuleType.values()).toList());
-
 
         for (RuleCreateDTO ruleCreateDTO : rules) {
 
@@ -150,7 +145,5 @@ public class CategoryService implements ICategoryService {
         }
 
         return res;
-
-
     }
 }

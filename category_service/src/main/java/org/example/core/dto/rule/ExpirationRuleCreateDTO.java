@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class ExpirationRuleCreateDTO extends RuleCreateDTO {
 
     @NotNull(message = "must not be null")
-    @Min(value = 0, message = "must not be more than 0")
+    @Min(value = 0, message = "must not be less than 0")
     @JsonProperty("days_till_expiration")
     private Integer daysTillExpiration;
 

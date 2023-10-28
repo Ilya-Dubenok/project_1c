@@ -14,8 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ExpirationRuleDTO extends ExpirationRuleCreateDTO {
 
-
-
     private UUID uuid;
 
     @JsonProperty("rule_type")
