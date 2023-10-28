@@ -11,10 +11,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableDiscoveryClient
 @EnableFeignClients
 @SpringBootApplication
-public class Main {
+public class CategoryServiceApplication {
 
     public static void main(String[] args)  {
-        SpringApplication.run(Main.class, args);
+        SpringApplication.run(CategoryServiceApplication.class, args);
 
 
     }
