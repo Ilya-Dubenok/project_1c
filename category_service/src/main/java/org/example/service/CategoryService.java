@@ -1,8 +1,8 @@
 package org.example.service;
 
-import lombok.AllArgsConstructor;
-import org.example.core.dto.CategoryCreateDTO;
-import org.example.core.dto.CategoryUpdateDTO;
+import lombok.RequiredArgsConstructor;
+import org.example.core.dto.category.CategoryCreateDTO;
+import org.example.core.dto.category.CategoryUpdateDTO;
 import org.example.core.exception.InternalException;
 import org.example.dao.entities.Category;
 import org.example.dao.repositories.ICategoryRepository;
@@ -24,12 +24,12 @@ import java.util.*;
 
 @Service
 @Validated
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CategoryService implements ICategoryService {
 
     private static final String NO_CATEGORY_FOUND_MESSAGE = "no category for the provided uuid found";
 
-    private ICategoryRepository categoryRepository;
+    private final ICategoryRepository categoryRepository;
 
     @Override
     public Category save(CategoryCreateDTO categoryCreateDTO) {

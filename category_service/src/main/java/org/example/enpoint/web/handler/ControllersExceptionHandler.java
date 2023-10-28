@@ -4,6 +4,7 @@ import com.google.common.base.CaseFormat;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
+import lombok.RequiredArgsConstructor;
 import org.example.core.exception.InternalException;
 import org.example.utils.exception.DataBaseExceptionParser;
 import org.example.core.exception.dto.InternalExceptionDTO;
@@ -23,13 +24,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.Iterator;
 
 @ControllerAdvice
+@RequiredArgsConstructor
 public class ControllersExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private DataBaseExceptionParser dataBaseExceptionParser;
-
-    public ControllersExceptionHandler(DataBaseExceptionParser dataBaseExceptionParser) {
-        this.dataBaseExceptionParser = dataBaseExceptionParser;
-    }
+    private final DataBaseExceptionParser dataBaseExceptionParser;
 
     @ExceptionHandler(value = InternalException.class)
     protected ResponseEntity<Object> handleGeneralException(InternalException e, WebRequest request) {

@@ -7,10 +7,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
-import org.example.core.dto.CategoryCreateDTO;
-import org.example.core.dto.CategoryDTO;
-import org.example.core.dto.CategoryUpdateDTO;
+import lombok.RequiredArgsConstructor;
+import org.example.core.dto.category.CategoryCreateDTO;
+import org.example.core.dto.category.CategoryDTO;
+import org.example.core.dto.category.CategoryUpdateDTO;
 import org.example.core.exception.dto.StructuredExceptionDTO;
 import org.example.dao.entities.Category;
 import org.example.core.dto.PageDTO;
@@ -27,14 +27,14 @@ import java.lang.reflect.Type;
 import java.util.UUID;
 
 @Tag(name = "Category")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/category")
 public class CategoryController {
 
-    private ICategoryService categoryService;
+    private final ICategoryService categoryService;
 
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
 
     @Operation(summary = "Create new category")

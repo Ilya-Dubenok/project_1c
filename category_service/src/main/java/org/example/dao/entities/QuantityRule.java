@@ -28,11 +28,6 @@ public class QuantityRule implements IRule{
     }
 
     @Override
-    public RuleType getRuleType() {
-        return this.ruleType;
-    }
-
-    @Override
     public void apply() {
 
     }

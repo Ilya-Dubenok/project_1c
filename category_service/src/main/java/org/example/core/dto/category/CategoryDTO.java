@@ -1,4 +1,4 @@
-package org.example.core.dto;
+package org.example.core.dto.category;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

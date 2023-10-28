@@ -1,8 +1,8 @@
 package org.example.service.api;
 
 import jakarta.validation.Valid;
-import org.example.core.dto.CategoryCreateDTO;
-import org.example.core.dto.CategoryUpdateDTO;
+import org.example.core.dto.category.CategoryCreateDTO;
+import org.example.core.dto.category.CategoryUpdateDTO;
 import org.example.dao.entities.Category;
 import org.example.dao.entities.RuleType;
 import org.springframework.data.domain.Page;

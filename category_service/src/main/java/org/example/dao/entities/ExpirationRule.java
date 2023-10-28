@@ -29,11 +29,6 @@ public class ExpirationRule implements IRule {
     }
 
     @Override
-    public RuleType getRuleType() {
-        return this.ruleType;
-    }
-
-    @Override
     public void apply() {
 
     }
