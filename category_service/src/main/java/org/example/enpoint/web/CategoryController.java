@@ -13,7 +13,6 @@ import org.example.core.dto.category.CategoryCreateDTO;
 import org.example.core.dto.category.CategoryDTO;
 import org.example.core.dto.category.CategoryUpdateDTO;
 import org.example.core.exception.dto.StructuredExceptionDTO;
-import org.example.dao.entities.Category;
 import org.example.service.api.ICategoryService;
 import org.example.core.exception.dto.InternalExceptionDTO;
 import org.modelmapper.ModelMapper;
@@ -49,9 +48,8 @@ public class CategoryController {
                             oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
             )})
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody CategoryCreateDTO categoryCreateDTO) {
-        categoryService.save(categoryCreateDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public CategoryDTO create(@Valid @RequestBody CategoryCreateDTO categoryCreateDTO) {
+        return categoryService.save(categoryCreateDTO);
     }
 
     @Operation(summary = "Get category by id")
@@ -65,15 +63,8 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)})
     @GetMapping("/{uuid}")
-    public ResponseEntity<CategoryDTO> getById(@PathVariable UUID uuid) {
-        Category category = categoryService.findByUUID(uuid);
-
-        if (null != category) {
-            CategoryDTO dto = mapper.map(category, CategoryDTO.class);
-            return new ResponseEntity<>(dto, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public CategoryDTO getById(@PathVariable UUID uuid) {
+        return categoryService.findByUUID(uuid);
     }
 
     @Operation(summary = "Get page of categories")
@@ -97,12 +88,8 @@ public class CategoryController {
                             oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
             )})
     @PutMapping(value = "/{uuid}")
-    public ResponseEntity<?> update(@PathVariable UUID uuid, @Valid @RequestBody CategoryUpdateDTO categoryUpdateDTO) {
-
-        categoryService.updateNameAndRules(uuid, categoryUpdateDTO);
-
-        return new ResponseEntity<>(HttpStatus.OK);
-
+    public CategoryDTO update(@PathVariable UUID uuid, @Valid @RequestBody CategoryUpdateDTO categoryUpdateDTO) {
+        return categoryService.updateNameAndRules(uuid, categoryUpdateDTO);
     }
 
     @Operation(summary = "delete category")

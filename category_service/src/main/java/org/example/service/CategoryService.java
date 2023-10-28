@@ -1,33 +1,25 @@
 package org.example.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.core.dto.PageDTO;
 import org.example.core.dto.category.CategoryCreateDTO;
 import org.example.core.dto.category.CategoryDTO;
 import org.example.core.dto.category.CategoryUpdateDTO;
+import org.example.core.exception.CategoryNotFoundException;
 import org.example.core.exception.InternalException;
 import org.example.dao.entities.Category;
 import org.example.dao.repositories.ICategoryRepository;
-import org.example.core.dto.rule.ExpirationRuleCreateDTO;
 import org.example.core.dto.rule.RuleCreateDTO;
-import org.example.core.dto.rule.QuantityRuleCreateDTO;
-import org.example.dao.entities.ExpirationRule;
 import org.example.dao.entities.IRule;
-import org.example.dao.entities.QuantityRule;
 import org.example.dao.entities.RuleType;
 import org.example.service.api.ICategoryService;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 @Service
-@Validated
 @RequiredArgsConstructor
 public class CategoryService implements ICategoryService {
 
@@ -39,7 +31,7 @@ public class CategoryService implements ICategoryService {
 
 
     @Override
-    public Category save(CategoryCreateDTO categoryCreateDTO) {
+    public CategoryDTO save(CategoryCreateDTO categoryCreateDTO) {
 
         String categoryName = categoryCreateDTO.getName();
 
@@ -59,14 +51,15 @@ public class CategoryService implements ICategoryService {
 
         List<IRule> rules = createRuleList(categoryCreateDTO.getRules());
 
-        Category toPersist = new Category(UUID.randomUUID(), categoryName, parent, rules);
+        Category categoryToSave = new Category(UUID.randomUUID(), categoryName, parent, rules);
 
-        return categoryRepository.save(toPersist);
+        return mapper.map(categoryRepository.save(categoryToSave), CategoryDTO.class);
     }
 
     @Override
-    public Category findByUUID(UUID uuid) {
-        return categoryRepository.findById(uuid).orElse(null);
+    public CategoryDTO findByUUID(UUID uuid) {
+        Category category = categoryRepository.findById(uuid).orElseThrow(CategoryNotFoundException::new);
+        return mapper.map(category, CategoryDTO.class);
     }
 
     @Override
@@ -76,75 +69,54 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public List<Category> findChildrenByParentId(UUID parentUUID) {
-        return categoryRepository.findByParent_UuidEquals(parentUUID);
+    public List<CategoryDTO> findChildrenByParentId(UUID parentUUID) {
+        return categoryRepository.findByParent_UuidEquals(parentUUID).stream()
+                .map(x->mapper.map(x, CategoryDTO.class))
+                .toList();
     }
 
     @Override
-    public Map<RuleType, Category> findCategoriesForRules(UUID startCategoryId, Set<RuleType> types) {
+    public Map<RuleType, CategoryDTO> findCategoriesForRules(UUID startCategoryId, Set<RuleType> types) {
         //TODO ADD LOGIC WHEN PRODUCT SERVICE IS DEFINED
         return null;
     }
 
     @Override
-    public Category updateNameAndRules(UUID uuid, CategoryUpdateDTO categoryUpdateDTO) {
+    public CategoryDTO updateNameAndRules(UUID uuid, CategoryUpdateDTO categoryUpdateDTO) {
 
-        Category toUpdate = categoryRepository.findById(uuid).orElseThrow(
+        Category categoryToUpdate = categoryRepository.findById(uuid).orElseThrow(
                 () -> new InternalException(NO_CATEGORY_FOUND_MESSAGE)
         );
-
-        toUpdate.setName(categoryUpdateDTO.getName());
-
+        categoryToUpdate.setName(categoryUpdateDTO.getName());
         List<IRule> rules = createRuleList(categoryUpdateDTO.getRules());
-
-        toUpdate.setRules(rules);
-
-        return categoryRepository.save(toUpdate);
+        categoryToUpdate.setRules(rules);
+        Category savedCategory = categoryRepository.save(categoryToUpdate);
+        return mapper.map(savedCategory, CategoryDTO.class);
     }
 
     @Override
     public void delete(UUID uuid) {
-
         if (!categoryRepository.existsById(uuid)) {
             throw new InternalException(NO_CATEGORY_FOUND_MESSAGE);
         }
-
         categoryRepository.deleteById(uuid);
     }
 
-    private List<IRule> createRuleList(List<RuleCreateDTO> rules) {
-
-        if (rules == null) {
-            return null;
-        }
-
-        List<IRule> res = new ArrayList<>();
+    private List<IRule> createRuleList(List<RuleCreateDTO> listOfRuleCreateDTO) {
 
         List<RuleType> ruleTypesLeft = new ArrayList<>(Arrays.stream(RuleType.values()).toList());
 
-        for (RuleCreateDTO ruleCreateDTO : rules) {
+        List<IRule> iRuleList = new ArrayList<>();
 
-            if (ruleTypesLeft.size() < 1) {
-                break;
-            }
+        listOfRuleCreateDTO.stream()
+                .takeWhile(ruleCreateDTO -> ruleTypesLeft.size() > 0)
+                .map(ruleCreateDTO ->  mapper.map(ruleCreateDTO, IRule.class))
+                .filter(x->ruleTypesLeft.contains(x.getRuleType()))
+                .forEach(x->{
+                    ruleTypesLeft.remove(x.getRuleType());
+                    iRuleList.add(x);
+                });
 
-            IRule iRule = null;
-
-            UUID randomUUID = UUID.randomUUID();
-
-            if (ruleCreateDTO instanceof QuantityRuleCreateDTO) {
-                iRule = new QuantityRule(randomUUID, ((QuantityRuleCreateDTO) ruleCreateDTO).getMinimumQuantity());
-                ruleTypesLeft.remove(RuleType.QUANT);
-
-            } else if (ruleCreateDTO instanceof ExpirationRuleCreateDTO) {
-                iRule = new ExpirationRule(randomUUID, ((ExpirationRuleCreateDTO) ruleCreateDTO).getDaysTillExpiration());
-                ruleTypesLeft.remove(RuleType.EXP);
-            }
-
-            res.add(iRule);
-
-        }
-
-        return res;
+        return iRuleList;
     }
 }

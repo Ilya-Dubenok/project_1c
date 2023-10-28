@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
 import lombok.RequiredArgsConstructor;
+import org.example.core.exception.CategoryNotFoundException;
 import org.example.core.exception.InternalException;
 import org.example.utils.exception.DataBaseExceptionParser;
 import org.example.core.exception.dto.InternalExceptionDTO;
@@ -42,23 +43,25 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
 
     @ExceptionHandler(value = ConstraintViolationException.class)
     protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e, WebRequest request) {
-
         StructuredExceptionDTO structuredExceptionDTO = new StructuredExceptionDTO();
-
         fillStructuredExceptionDTOFromContraintViolationException(structuredExceptionDTO, e);
-
         return new ResponseEntity<>(structuredExceptionDTO, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException e, WebRequest request) {
-
-        InternalExceptionDTO generalExceptionToFill = new InternalExceptionDTO();
-        if (dataBaseExceptionParser.fillIfExceptionRecognized(e, generalExceptionToFill)) {
-            return new ResponseEntity<>(generalExceptionToFill, HttpStatus.BAD_REQUEST);
+        InternalExceptionDTO internalExceptionDTO = new InternalExceptionDTO();
+        if (dataBaseExceptionParser.fillIfExceptionRecognized(e, internalExceptionDTO)) {
+            return new ResponseEntity<>(internalExceptionDTO, HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<>("some error occurred during operation", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @ExceptionHandler(value = CategoryNotFoundException.class)
+    public ResponseEntity<Object> handleCategoryNotFoundException(CategoryNotFoundException e, WebRequest request) {
+        InternalExceptionDTO internalExceptionDTO = new InternalExceptionDTO(e.getMessage());
+        return new ResponseEntity<>(internalExceptionDTO,HttpStatus.NOT_FOUND);
     }
 
     @Override
@@ -80,9 +83,7 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-
         String propertyName = ex.getPropertyName();
-
         String message = propertyName + " is malformed";
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
