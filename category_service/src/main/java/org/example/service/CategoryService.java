@@ -32,27 +32,10 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public CategoryDTO save(CategoryCreateDTO categoryCreateDTO) {
-
-        String categoryName = categoryCreateDTO.getName();
-
-        if (categoryRepository.findByName(categoryName) != null) {
-            throw new InternalException("This name is already present");
-        }
-
-        UUID parentUuid = categoryCreateDTO.getParentUuid();
-
-        Category parent = null;
-
-        if (null != parentUuid) {
-            parent = categoryRepository.findById(parentUuid).orElseThrow(
-                    () -> new InternalException("No category for this parent uuid found")
-            );
-        }
-
+        String categoryName = getValidatedCategoryName(categoryCreateDTO);
+        Category parent = getValidatedCategoryParent(categoryCreateDTO);
         List<IRule> rules = createRuleList(categoryCreateDTO.getRules());
-
         Category categoryToSave = new Category(UUID.randomUUID(), categoryName, parent, rules);
-
         return mapper.map(categoryRepository.save(categoryToSave), CategoryDTO.class);
     }
 
@@ -100,6 +83,25 @@ public class CategoryService implements ICategoryService {
             throw new InternalException(NO_CATEGORY_FOUND_MESSAGE);
         }
         categoryRepository.deleteById(uuid);
+    }
+
+    private String getValidatedCategoryName(CategoryCreateDTO categoryCreateDTO) {
+        String categoryName = categoryCreateDTO.getName();
+        if (categoryRepository.findByName(categoryName) != null) {
+            throw new InternalException("This name is already present");
+        }
+        return categoryName;
+    }
+
+    private Category getValidatedCategoryParent(CategoryCreateDTO categoryCreateDTO) {
+        UUID parentUuid = categoryCreateDTO.getParentUuid();
+        Category parent = null;
+        if (null != parentUuid) {
+            parent = categoryRepository.findById(parentUuid).orElseThrow(
+                    () -> new InternalException("No category for this parent uuid found")
+            );
+        }
+        return parent;
     }
 
     private List<IRule> createRuleList(List<RuleCreateDTO> listOfRuleCreateDTO) {
