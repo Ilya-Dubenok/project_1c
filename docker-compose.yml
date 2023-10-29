@@ -10,7 +10,7 @@ services:
       - services_ntwrk
 
   pgadmin:
-    build: pgadmin
+    build: postgresql/pgadmin
     depends_on:
     - postgres_db
     environment:
