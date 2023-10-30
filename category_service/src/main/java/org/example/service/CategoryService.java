@@ -108,17 +108,12 @@ public class CategoryService implements ICategoryService {
 
         List<RuleType> ruleTypesLeft = new ArrayList<>(Arrays.stream(RuleType.values()).toList());
 
-        List<IRule> iRuleList = new ArrayList<>();
-
-        listOfRuleCreateDTO.stream()
+        return listOfRuleCreateDTO.stream()
                 .takeWhile(ruleCreateDTO -> ruleTypesLeft.size() > 0)
                 .map(ruleCreateDTO ->  mapper.map(ruleCreateDTO, IRule.class))
                 .filter(x->ruleTypesLeft.contains(x.getRuleType()))
-                .forEach(x->{
-                    ruleTypesLeft.remove(x.getRuleType());
-                    iRuleList.add(x);
-                });
+                .peek(x -> ruleTypesLeft.remove(x.getRuleType()))
+                .toList();
 
-        return iRuleList;
     }
 }
