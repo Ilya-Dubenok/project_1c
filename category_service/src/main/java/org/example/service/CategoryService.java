@@ -114,6 +114,5 @@ public class CategoryService implements ICategoryService {
                 .filter(x->ruleTypesLeft.contains(x.getRuleType()))
                 .peek(x -> ruleTypesLeft.remove(x.getRuleType()))
                 .toList();
-
     }
 }
