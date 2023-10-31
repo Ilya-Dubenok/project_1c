@@ -51,7 +51,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public List<CategoryDTO> findChildrenByParentId(UUID parentUUID) {
         return categoryRepository.findByParent_UuidEquals(parentUUID).stream()
-                .map(x->mapper.map(x, CategoryDTO.class))
+                .map(x -> mapper.map(x, CategoryDTO.class))
                 .toList();
     }
 
@@ -105,8 +105,8 @@ public class CategoryService implements ICategoryService {
 
         return listOfRuleCreateDTO.stream()
                 .takeWhile(ruleCreateDTO -> ruleTypesLeft.size() > 0)
-                .map(ruleCreateDTO ->  mapper.map(ruleCreateDTO, IRule.class))
-                .filter(x->ruleTypesLeft.contains(x.getRuleType()))
+                .map(ruleCreateDTO -> mapper.map(ruleCreateDTO, IRule.class))
+                .filter(x -> ruleTypesLeft.contains(x.getRuleType()))
                 .peek(x -> ruleTypesLeft.remove(x.getRuleType()))
                 .toList();
     }
