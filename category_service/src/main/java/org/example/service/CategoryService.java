@@ -23,12 +23,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CategoryService implements ICategoryService {
 
-    private static final String NO_CATEGORY_FOUND_MESSAGE = "no category for the provided uuid found";
-
     private final ICategoryRepository categoryRepository;
 
     private final ModelMapper mapper;
-
 
     @Override
     public CategoryDTO save(CategoryCreateDTO categoryCreateDTO) {
@@ -67,9 +64,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public CategoryDTO updateNameAndRules(UUID uuid, CategoryUpdateDTO categoryUpdateDTO) {
 
-        Category categoryToUpdate = categoryRepository.findById(uuid).orElseThrow(
-                () -> new InternalException(NO_CATEGORY_FOUND_MESSAGE)
-        );
+        Category categoryToUpdate = categoryRepository.findById(uuid).orElseThrow(CategoryNotFoundException::new);
         categoryToUpdate.setName(categoryUpdateDTO.getName());
         List<IRule> rules = createRuleList(categoryUpdateDTO.getRules());
         categoryToUpdate.setRules(rules);
@@ -80,7 +75,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public void delete(UUID uuid) {
         if (!categoryRepository.existsById(uuid)) {
-            throw new InternalException(NO_CATEGORY_FOUND_MESSAGE);
+            throw new CategoryNotFoundException();
         }
         categoryRepository.deleteById(uuid);
     }
