@@ -7,13 +7,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
 @EnableJpaRepositories
-@EnableDiscoveryClient(autoRegister = false)
+@EnableDiscoveryClient
 @SpringBootApplication
 public class CategoryServiceApplication {
 
     public static void main(String[] args)  {
         SpringApplication.run(CategoryServiceApplication.class, args);
-
-
     }
 }
