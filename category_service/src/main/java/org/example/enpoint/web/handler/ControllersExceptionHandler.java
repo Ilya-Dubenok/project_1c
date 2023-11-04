@@ -7,6 +7,7 @@ import jakarta.validation.Path;
 import lombok.RequiredArgsConstructor;
 import org.example.core.exception.CategoryNotFoundException;
 import org.example.core.exception.InternalException;
+import org.example.core.exception.RequestNotFromGatewayException;
 import org.example.utils.exception.DataBaseExceptionParser;
 import org.example.core.exception.dto.InternalExceptionDTO;
 import org.example.core.exception.dto.StructuredExceptionDTO;
@@ -62,6 +63,11 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
     public ResponseEntity<Object> handleCategoryNotFoundException(CategoryNotFoundException e, WebRequest request) {
         InternalExceptionDTO internalExceptionDTO = new InternalExceptionDTO(e.getMessage());
         return new ResponseEntity<>(internalExceptionDTO,HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = RequestNotFromGatewayException.class)
+    public ResponseEntity<Object> handleRequestNotFromGatewayException(RequestNotFromGatewayException e, WebRequest request) {
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @Override
