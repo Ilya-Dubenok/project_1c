@@ -1,6 +1,6 @@
 spring:
   application:
-    name: category_service
+    name: category-service
 
   jpa:
     generate-ddl: false
