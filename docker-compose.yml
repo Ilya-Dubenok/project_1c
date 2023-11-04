@@ -28,18 +28,27 @@ services:
     networks:
       - services_ntwrk
 
+  gateway:
+    build: gateway
+    depends_on:
+    - eureka-server
+    ports:
+      - "80:80"
+    networks:
+      - services_ntwrk
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+
   category_service:
     build: category_service
     depends_on:
       - postgres_db
-      - eureka-server
+      - gateway
     environment:
       spring.datasource.url: jdbc:postgresql://postgres_db:5432/category_service?ApplicationName=Category_Service
       spring.datasource.username: root
       spring.datasource.password: root
       EUREKA_URI: http://eureka-server:8761/eureka
-    ports:
-      - "8080:8080"
     networks:
       - services_ntwrk
 
