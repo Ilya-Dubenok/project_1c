@@ -26,7 +26,7 @@ public class GatewayConfig {
                         .addRequestHeader("gateway", "true");
 
         return routeBuilder.routes()
-                .route("category_service_route", r -> r.path("/api/v1/category/**")
+                .route("category_service_route", r -> r.path("/api/v1/category/**", "/category-service/v3/api-docs")
                         .filters(replaceSegmentAndAddHeaderFunction)
                         .uri("lb://category-service")
                 )
