@@ -1,24 +1,6 @@
 spring:
   application:
     name: category-service
-
-  jpa:
-    generate-ddl: false
-    properties:
-      hibernate:
-        format_sql: true
-
-  datasource:
-    url: jdbc:postgresql://localhost:5432/category_service?ApplicationName=Category_Service
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      schema: app
-
-  jackson:
-    property-naming-strategy: SNAKE_CASE
-
   config:
     import: "optional:configserver:"
 
@@ -28,25 +10,12 @@ spring:
       discovery:
         enabled: true
         service-id: config-server
-
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
   instance:
     preferIpAddress: true
-
-springdoc:
-  api-docs:
-    path: /category-service/v3/api-docs
-  swagger-ui:
-    path: /category-service/swagger-ui.html
-
-openapi:
-  service:
-    title: category-service-doc
-    version: 1.0.0
-    url: http://localhost/api/v1
 
 logging:
   level:
@@ -59,9 +28,3 @@ logging:
             bind:
               Trace
 
-server:
-  port: 8080
-  servlet:
-    encoding:
-      charset: UTF-8
-      force: true
