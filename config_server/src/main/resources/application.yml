@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Ilya-Dubenok/project_1c
+          default-label: master
+          search-paths:
+            - 'config/{application}/{profile}'
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    preferIpAddress: true
+
+server:
+  port: 9922

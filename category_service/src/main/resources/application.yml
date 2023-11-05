@@ -19,6 +19,16 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
 
+  config:
+    import: "optional:configserver:"
+
+  cloud:
+    config:
+      label: config_server
+      discovery:
+        enabled: true
+        service-id: config-server
+
 eureka:
   client:
     service-url:
