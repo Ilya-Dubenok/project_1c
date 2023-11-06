@@ -18,6 +18,18 @@ spring:
       auto-index-creation: true
       field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
+springdoc:
+  api-docs:
+    path: /product-service/v3/api-docs
+  swagger-ui:
+    path: /product-service/swagger-ui.html
+
+openapi:
+  service:
+    title: product-service-doc
+    version: 1.0.0
+    url: http://localhost/api/v1
+
 eureka:
   client:
     service-url:
