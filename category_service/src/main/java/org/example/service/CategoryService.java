@@ -80,6 +80,11 @@ public class CategoryService implements ICategoryService {
         categoryRepository.deleteById(uuid);
     }
 
+    @Override
+    public Boolean existsByUuid(UUID uuid) {
+        return categoryRepository.existsById(uuid);
+    }
+
     private String getValidatedCategoryName(CategoryCreateDTO categoryCreateDTO) {
         String categoryName = categoryCreateDTO.getName();
         if (categoryRepository.findByName(categoryName) != null) {
