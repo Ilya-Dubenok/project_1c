@@ -22,6 +22,8 @@ springdoc:
     urls:
       - url: /category-service/v3/api-docs
         name: category
+      - url: /product-service/v3/api-docs
+        name: product
 
 ---
 spring:
