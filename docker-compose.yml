@@ -26,8 +26,8 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ADMIN_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ADMIN_PASSWORD}
     networks:
       - services_ntwrk
 
@@ -38,9 +38,9 @@ services:
     ports:
       - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo_db:27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ADMIN_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ADMIN_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ADMIN_USERNAME}:${MONGO_ADMIN_PASSWORD}@mongo_db:27017
     networks:
       - services_ntwrk
 
@@ -81,6 +81,18 @@ services:
       spring.datasource.url: jdbc:postgresql://postgres_db:5432/category_service?ApplicationName=Category_Service
       spring.datasource.username: root
       spring.datasource.password: root
+      EUREKA_URI: ${EUREKA_URI}
+    networks:
+      - services_ntwrk
+
+  product_service:
+    build: product_service
+    depends_on:
+      - mongo_db
+      - gateway
+      - config_server
+    environment:
+      spring.data.mongodb.uri: mongodb://${MONGO_ADMIN_USERNAME}:${MONGO_ADMIN_PASSWORD}@mongo_db:27017/project1c_db?authSource=admin
       EUREKA_URI: ${EUREKA_URI}
     networks:
       - services_ntwrk
