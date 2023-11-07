@@ -6,6 +6,7 @@ import org.example.core.dto.product.ProductCreateDTO;
 import org.example.core.dto.product.ProductDTO;
 import org.example.core.dto.rule.RuleDTO;
 import org.example.core.exception.InternalException;
+import org.example.core.exception.ProductNotFoundException;
 import org.example.dao.entities.product.IRule;
 import org.example.dao.entities.product.Item;
 import org.example.dao.entities.product.Product;
@@ -62,22 +63,27 @@ public class ProductService implements IProductService {
 
     @Override
     public ProductDTO findByUUID(UUID uuid) {
-        return null;
+        Product product = productRepository.findById(uuid).orElseThrow(ProductNotFoundException::new);
+        return mapper.map(product, ProductDTO.class);
     }
 
     @Override
     public ProductDTO findByName(String name) {
-        return null;
+        Product product = productRepository.findByName(name.toLowerCase()).orElseThrow(ProductNotFoundException::new);
+        return mapper.map(product, ProductDTO.class);
     }
 
     @Override
     public Page<ProductDTO> getPage(Pageable pageable) {
-        return null;
+        Page<Product> pageOfProducts = productRepository.findAll(pageable);
+        return pageOfProducts.map(category -> mapper.map(category, ProductDTO.class));
     }
 
     @Override
     public ProductDTO updateName(UUID productUuid, String name) {
-        return null;
+        Product product = productRepository.findById(productUuid).orElseThrow(ProductNotFoundException::new);
+        product.setName(name);
+        return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
     @Override
