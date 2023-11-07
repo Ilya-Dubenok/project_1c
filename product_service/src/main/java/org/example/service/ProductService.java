@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -145,7 +146,16 @@ public class ProductService implements IProductService {
     }
 
     private List<Item> formListOfItems(List<ItemDTO> itemDTOList) {
-        return itemDTOList == null ? new ArrayList<>() : itemDTOList.stream().map(itemDTO -> mapper.map(itemDTO, Item.class)).toList();
+        if (null == itemDTOList || itemDTOList.size() == 0) {
+            return new ArrayList<>();
+        }
+        Map<LocalDate, Item> itemMap = itemDTOList.stream()
+                .map(itemDTO -> mapper.map(itemDTO, Item.class))
+                .collect(Collectors.toMap(Item::getExpiresAt, Function.identity(), (Item item1, Item item2) -> {
+                    item1.setQuantity(item1.getQuantity() + item2.getQuantity());
+                    return item1;
+                }));
+        return new ArrayList<>(itemMap.values());
     }
 
     private Set<IRule> formSetOfRules(List<RuleDTO> ruleDTOList) {
