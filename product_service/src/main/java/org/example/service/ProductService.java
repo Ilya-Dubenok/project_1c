@@ -43,27 +43,9 @@ public class ProductService implements IProductService {
         return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
-    private List<Item> formListOfItems(List<ItemDTO> itemDTOList) {
-        return itemDTOList == null ? new ArrayList<>() : itemDTOList.stream().map(itemDTO -> mapper.map(itemDTO, Item.class)).toList();
-    }
-
-    private Set<IRule> formSetOfRules(List<RuleDTO> ruleDTOList) {
-        if (null == ruleDTOList) {
-            return new HashSet<>();
-        }
-        List<RuleType> ruleTypesLeft = new ArrayList<>(List.of(RuleType.values()));
-
-        return ruleDTOList.stream()
-                .takeWhile(rule -> ruleTypesLeft.size() > 0)
-                .map(rule -> mapper.map(rule, IRule.class))
-                .filter(rule -> ruleTypesLeft.contains(rule.getRuleType()))
-                .peek(rule -> ruleTypesLeft.remove(rule.getRuleType()))
-                .collect(Collectors.toSet());
-    }
-
     @Override
     public ProductDTO findByUUID(UUID uuid) {
-        Product product = productRepository.findById(uuid).orElseThrow(ProductNotFoundException::new);
+        Product product = getProductOrThrow(uuid);
         return mapper.map(product, ProductDTO.class);
     }
 
@@ -81,44 +63,102 @@ public class ProductService implements IProductService {
 
     @Override
     public ProductDTO updateName(UUID productUuid, String name) {
-        Product product = productRepository.findById(productUuid).orElseThrow(ProductNotFoundException::new);
+        Product product = getProductOrThrow(productUuid);
         product.setName(name);
         return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
     @Override
-    public ProductDTO updateRules(UUID productUuid, List<RuleDTO> rules) {
-        return null;
+    public ProductDTO updateRules(UUID productUuid, List<RuleDTO> ruleDTOList) {
+        Product product = getProductOrThrow(productUuid);
+        Set<IRule> ruleSet = formSetOfRules(ruleDTOList);
+        product.setRules(ruleSet);
+        return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
     @Override
-    public ProductDTO updateItems(UUID productUuid, List<ItemDTO> items) {
-        return null;
+    public ProductDTO updateItems(UUID productUuid, List<ItemDTO> itemDTOList) {
+        Product product = getProductOrThrow(productUuid);
+        List<Item> items = formListOfItems(itemDTOList);
+        product.setItems(items);
+        return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
     @Override
-    public ProductDTO changeItem(UUID productUuid, String itemName, ItemDTO replacement) {
-        return null;
+    public ProductDTO addItem(UUID productUuid, ItemDTO itemDTO) {
+        Product product = getProductOrThrow(productUuid);
+        Optional<Item> sameItemForExpiresAt = product.getItems().stream()
+                .filter(item -> Objects.equals(item.getExpiresAt(), itemDTO.getExpiresAt()))
+                .findAny();
+
+        sameItemForExpiresAt.ifPresentOrElse(
+                item -> item.setQuantity(item.getQuantity() + itemDTO.getQuantity()),
+                () -> product.getItems().add(mapper.map(itemDTO, Item.class))
+        );
+        return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
     @Override
-    public ProductDTO addToItemQuantity(UUID productUuid, String itemName, Integer summand) {
-        return null;
+    public ProductDTO addToItemQuantity(UUID productUuid, LocalDate expiresAt, Integer summand) {
+        Product product = getProductOrThrow(productUuid);
+        Item item = product.getItems().stream()
+                .filter(i -> Objects.equals(i.getExpiresAt(), expiresAt))
+                .findAny()
+                .orElseThrow(() -> new InternalException("no item found for this expiration date"));
+
+        int totalAmount = item.getQuantity() + summand;
+        if (totalAmount <= 0) {
+            product.getItems().remove(item);
+        } else {
+            item.setQuantity(totalAmount);
+        }
+        return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
     @Override
-    public ProductDTO changeItemExpirationDate(UUID productUuid, String itemName, LocalDate replacement) {
-        return null;
+    public ProductDTO changeItemExpirationDate(UUID productUuid, LocalDate expiresAt, LocalDate replacement) {
+        Product product = getProductOrThrow(productUuid);
+        Item item = product.getItems().stream()
+                .filter(i -> Objects.equals(i.getExpiresAt(), expiresAt))
+                .findAny()
+                .orElseThrow(() -> new InternalException("no item found for this expiration date"));
+        item.setExpiresAt(replacement);
+        return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
     @Override
     public void delete(UUID productUuid) {
-
+        if (!productRepository.existsById(productUuid)) {
+            throw new ProductNotFoundException();
+        }
+        productRepository.deleteById(productUuid);
     }
 
     private void verifyCategoryUuid(UUID categoryId) {
         if (!categoryClient.categoryExists(categoryId)) {
             throw new InternalException("specified category does not exist");
         }
+    }
+
+    private Product getProductOrThrow(UUID productUuid) {
+        return productRepository.findById(productUuid).orElseThrow(ProductNotFoundException::new);
+    }
+
+    private List<Item> formListOfItems(List<ItemDTO> itemDTOList) {
+        return itemDTOList == null ? new ArrayList<>() : itemDTOList.stream().map(itemDTO -> mapper.map(itemDTO, Item.class)).toList();
+    }
+
+    private Set<IRule> formSetOfRules(List<RuleDTO> ruleDTOList) {
+        if (null == ruleDTOList) {
+            return new HashSet<>();
+        }
+        List<RuleType> ruleTypesLeft = new ArrayList<>(List.of(RuleType.values()));
+
+        return ruleDTOList.stream()
+                .takeWhile(rule -> ruleTypesLeft.size() > 0)
+                .map(rule -> mapper.map(rule, IRule.class))
+                .filter(rule -> ruleTypesLeft.contains(rule.getRuleType()))
+                .peek(rule -> ruleTypesLeft.remove(rule.getRuleType()))
+                .collect(Collectors.toSet());
     }
 }

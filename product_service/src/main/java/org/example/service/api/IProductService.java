@@ -23,15 +23,15 @@ public interface IProductService {
 
     ProductDTO updateName(UUID productUuid, String name);
 
-    ProductDTO updateRules(UUID productUuid, List<RuleDTO> rules);
+    ProductDTO updateRules(UUID productUuid, List<RuleDTO> ruleDTOList);
 
-    ProductDTO updateItems(UUID productUuid, List<ItemDTO> items);
+    ProductDTO updateItems(UUID productUuid, List<ItemDTO> itemDTOList);
 
-    ProductDTO changeItem(UUID productUuid, String itemName, ItemDTO replacement);
+    ProductDTO addItem(UUID productUuid, ItemDTO itemDTO);
 
-    ProductDTO addToItemQuantity(UUID productUuid, String itemName, Integer summand);
+    ProductDTO addToItemQuantity(UUID productUuid, LocalDate expiresAt, Integer summand);
 
-    ProductDTO changeItemExpirationDate(UUID productUuid, String itemName, LocalDate replacement);
+    ProductDTO changeItemExpirationDate(UUID productUuid, LocalDate expiresAt, LocalDate replacement);
 
     void delete(UUID productUuid);
 }
