@@ -8,17 +8,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.core.dto.product.ItemDTO;
 import org.example.core.dto.product.ProductCreateDTO;
 import org.example.core.dto.product.ProductDTO;
+import org.example.core.dto.rule.RuleDTO;
 import org.example.core.exception.dto.InternalExceptionDTO;
 import org.example.core.exception.dto.StructuredExceptionDTO;
-import org.example.service.ProductService;
+import org.example.service.api.IProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Product")
@@ -28,7 +31,7 @@ import java.util.UUID;
 @RequestMapping(value = "/product")
 public class ProductController {
 
-    private final ProductService productService;
+    private final IProductService productService;
 
     @Operation(summary = "Create new product")
     @ApiResponses(value = {
@@ -87,4 +90,42 @@ public class ProductController {
         return productService.getPage(pageable);
     }
 
+    @Operation(summary = "Update name of the product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Name updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid params passed",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InternalExceptionDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Product not found",
+                    content = @Content)})
+    @PatchMapping("/{uuid}/name/{name}")
+    public ProductDTO updateName(@PathVariable UUID uuid, @PathVariable String name) {
+        return productService.updateName(uuid, name);
+    }
+
+    @Operation(summary = "Update rules of the product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Rules updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid params passed",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InternalExceptionDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Product not found",
+                    content = @Content)})
+    @PatchMapping("/{uuid}/rules")
+    public ProductDTO updateRules(@PathVariable(name = "uuid") UUID uuid, @Valid @RequestBody List<RuleDTO> ruleDTOList) {
+        return productService.updateRules(uuid, ruleDTOList);
+    }
+
+    @Operation(summary = "Update items of the product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Items updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid params passed",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InternalExceptionDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Product not found",
+                    content = @Content)})
+    @PatchMapping("/{uuid}/items")
+    public ProductDTO updateItems(@PathVariable UUID uuid, @Valid @RequestBody List<ItemDTO> itemDTOList) {
+        return productService.updateItems(uuid, itemDTOList);
+    }
 }

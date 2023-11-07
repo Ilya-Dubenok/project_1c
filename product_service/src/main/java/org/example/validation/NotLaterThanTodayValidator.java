@@ -9,6 +9,6 @@ public class NotLaterThanTodayValidator implements ConstraintValidator<NotLaterT
 
     @Override
     public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
-        return value.isAfter(LocalDate.now()) || value.isEqual(LocalDate.now());
+        return value == null || value.isAfter(LocalDate.now()) || value.isEqual(LocalDate.now());
     }
 }
