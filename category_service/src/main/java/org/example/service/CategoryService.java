@@ -108,7 +108,7 @@ public class CategoryService implements ICategoryService {
         if (null == listOfRuleCreateDTO) {
             return new ArrayList<>();
         }
-        List<RuleType> ruleTypesLeft = new ArrayList<>(Arrays.stream(RuleType.values()).toList());
+        List<RuleType> ruleTypesLeft = new ArrayList<>(List.of(RuleType.values()));
 
         return listOfRuleCreateDTO.stream()
                 .takeWhile(ruleCreateDTO -> ruleTypesLeft.size() > 0)
