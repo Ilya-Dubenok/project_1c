@@ -19,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -172,5 +174,18 @@ public class ProductController {
                                                @RequestParam(name = "expires_at", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate expiresAt,
                                                @RequestParam(name = "new_date", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate replacement) {
         return productService.changeItemExpirationDate(uuid, expiresAt, replacement);
+    }
+
+    @Operation(summary = "delete product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Some error occurred",
+                    content = {@Content(mediaType = "application/json", schema =
+                    @Schema(description = "errors messages",
+                            oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
+            )})
+    @DeleteMapping(value = "/{uuid}")
+    public ResponseEntity<?> delete(@PathVariable UUID uuid) {
+        productService.delete(uuid);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
