@@ -158,4 +158,19 @@ public class ProductController {
                                         @RequestParam(name = "summand") Integer summand) {
         return productService.addToItemQuantity(uuid, expiresAt, summand);
     }
+
+    @Operation(summary = "Change expiration date of the stored item of the product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Expiration date was changed"),
+            @ApiResponse(responseCode = "400", description = "Invalid params passed",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InternalExceptionDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Product not found",
+                    content = @Content)})
+    @PatchMapping("/{uuid}/items/expiration")
+    public ProductDTO changeItemExpirationDate(@PathVariable UUID uuid,
+                                               @RequestParam(name = "expires_at", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate expiresAt,
+                                               @RequestParam(name = "new_date", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate replacement) {
+        return productService.changeItemExpirationDate(uuid, expiresAt, replacement);
+    }
 }

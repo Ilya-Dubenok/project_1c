@@ -93,7 +93,7 @@ public class ProductService implements IProductService {
                 .findAny();
 
         sameItemForExpiresAt.ifPresentOrElse(
-                persistedItem -> persistedItem .setQuantity(persistedItem.getQuantity() + itemDTO.getQuantity()),
+                persistedItem -> persistedItem.setQuantity(persistedItem.getQuantity() + itemDTO.getQuantity()),
                 () -> product.getItems().add(mapper.map(itemDTO, Item.class))
         );
         return mapper.map(productRepository.save(product), ProductDTO.class);
@@ -124,6 +124,7 @@ public class ProductService implements IProductService {
                 .findAny()
                 .orElseThrow(() -> new InternalException("no item found for this expiration date"));
         item.setExpiresAt(replacement);
+        mergeItemsWithSameExpirationDate(product.getItems(), item);
         return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
@@ -133,6 +134,17 @@ public class ProductService implements IProductService {
             throw new ProductNotFoundException();
         }
         productRepository.deleteById(productUuid);
+    }
+
+    private void mergeItemsWithSameExpirationDate(List<Item> items, Item probeItem) {
+        if (null != items) {
+            items.stream().filter(listItem -> listItem != probeItem && Objects.equals(listItem.getExpiresAt(), probeItem.getExpiresAt()))
+                    .findAny()
+                    .ifPresent(duplicateItem -> {
+                        probeItem.setQuantity(probeItem.getQuantity() + duplicateItem.getQuantity());
+                        items.remove(duplicateItem);
+                    });
+        }
     }
 
     private void verifyCategoryUuid(UUID categoryId) {
@@ -151,7 +163,7 @@ public class ProductService implements IProductService {
         }
         Map<LocalDate, Item> itemMap = itemDTOList.stream()
                 .map(itemDTO -> mapper.map(itemDTO, Item.class))
-                .collect(Collectors.toMap(Item::getExpiresAt, Function.identity(), (Item item1, Item item2) -> {
+                .collect(Collectors.toMap(Item::getExpiresAt, Function.identity(), (item1, item2) -> {
                     item1.setQuantity(item1.getQuantity() + item2.getQuantity());
                     return item1;
                 }));
