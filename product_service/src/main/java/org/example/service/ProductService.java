@@ -89,11 +89,11 @@ public class ProductService implements IProductService {
     public ProductDTO addItem(UUID productUuid, ItemDTO itemDTO) {
         Product product = getProductOrThrow(productUuid);
         Optional<Item> sameItemForExpiresAt = product.getItems().stream()
-                .filter(item -> Objects.equals(item.getExpiresAt(), itemDTO.getExpiresAt()))
+                .filter(persistedItem -> Objects.equals(persistedItem.getExpiresAt(), itemDTO.getExpiresAt()))
                 .findAny();
 
         sameItemForExpiresAt.ifPresentOrElse(
-                item -> item.setQuantity(item.getQuantity() + itemDTO.getQuantity()),
+                persistedItem -> persistedItem .setQuantity(persistedItem.getQuantity() + itemDTO.getQuantity()),
                 () -> product.getItems().add(mapper.map(itemDTO, Item.class))
         );
         return mapper.map(productRepository.save(product), ProductDTO.class);

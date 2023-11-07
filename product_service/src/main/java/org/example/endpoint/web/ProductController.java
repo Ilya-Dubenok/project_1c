@@ -18,9 +18,11 @@ import org.example.service.api.IProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -127,5 +129,33 @@ public class ProductController {
     @PatchMapping("/{uuid}/items")
     public ProductDTO updateItems(@PathVariable UUID uuid, @Valid @RequestBody List<ItemDTO> itemDTOList) {
         return productService.updateItems(uuid, itemDTOList);
+    }
+
+    @Operation(summary = "Add new item to the product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Item added to product"),
+            @ApiResponse(responseCode = "400", description = "Invalid params passed",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InternalExceptionDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Product not found",
+                    content = @Content)})
+    @PostMapping("/{uuid}/items/add")
+    public ProductDTO addItem(@PathVariable UUID uuid, @Valid @RequestBody ItemDTO itemDTO) {
+        return productService.addItem(uuid, itemDTO);
+    }
+
+    @Operation(summary = "Increase or decrease quantity of the stored item")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Quantity was changed"),
+            @ApiResponse(responseCode = "400", description = "Invalid params passed",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InternalExceptionDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Product not found",
+                    content = @Content)})
+    @PatchMapping("/{uuid}/items/add")
+    public ProductDTO addToItemQuantity(@PathVariable UUID uuid,
+                                        @RequestParam(name = "expires_at", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate expiresAt,
+                                        @RequestParam(name = "summand") Integer summand) {
+        return productService.addToItemQuantity(uuid, expiresAt, summand);
     }
 }
