@@ -13,6 +13,9 @@ import org.example.core.dto.product.ProductDTO;
 import org.example.core.exception.dto.InternalExceptionDTO;
 import org.example.core.exception.dto.StructuredExceptionDTO;
 import org.example.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,6 +72,19 @@ public class ProductController {
     @GetMapping("/name")
     public ProductDTO getByName(@RequestParam(value = "name") String name) {
         return productService.findByName(name);
+    }
+
+    @Operation(summary = "Get page of products")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Page returned"),
+            @ApiResponse(responseCode = "400", description = "Invalid params passed",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InternalExceptionDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Products not found",
+                    content = @Content)})
+    @GetMapping
+    public Page<ProductDTO> getPage(@PageableDefault(size = 20, sort = {"name"}) Pageable pageable) {
+        return productService.getPage(pageable);
     }
 
 }
