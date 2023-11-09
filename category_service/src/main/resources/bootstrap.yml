@@ -4,7 +4,7 @@ spring:
 
   cloud:
     config:
-      label: config_server
+      label: config_server,dev
       discovery:
         enabled: true
         service-id: config-server
