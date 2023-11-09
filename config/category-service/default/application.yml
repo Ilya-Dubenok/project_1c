@@ -1,7 +1,4 @@
 spring:
-  application:
-    name: category-service
-
   jpa:
     generate-ddl: false
     properties:
@@ -37,17 +34,6 @@ openapi:
     title: category-service-doc
     version: 1.0.0
     url: http://localhost/api/v1
-
-logging:
-  level:
-    org:
-      hibernate:
-        SQL:
-          DEBUG
-        orm:
-          jdbc:
-            bind:
-              Trace
 
 server:
   port: 8080
