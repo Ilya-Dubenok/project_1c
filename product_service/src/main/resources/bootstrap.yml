@@ -8,6 +8,10 @@ spring:
       discovery:
         enabled: true
         service-id: config-server
+      fail-fast: true
+      retry:
+        initial-interval: 2000
+        max-interval: 4000
 
 eureka:
   client:
