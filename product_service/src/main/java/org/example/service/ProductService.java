@@ -12,7 +12,7 @@ import org.example.dao.entities.product.Item;
 import org.example.dao.entities.product.Product;
 import org.example.dao.entities.product.RuleType;
 import org.example.dao.repository.IProductRepository;
-import org.example.service.api.CategoryClient;
+import org.example.service.api.ICategoryClient;
 import org.example.service.api.IProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -32,7 +32,7 @@ public class ProductService implements IProductService {
 
     private final IProductRepository productRepository;
 
-    private final CategoryClient categoryClient;
+    private final ICategoryClient categoryClient;
 
     @Override
     public ProductDTO save(ProductCreateDTO productCreateDTO) {

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.UUID;
 
 @FeignClient(name = "category-service", path = "/internal")
-public interface CategoryClient {
+public interface ICategoryClient {
 
     @RequestMapping(method = RequestMethod.GET, path = "/exists/{uuid}")
     Boolean categoryExists(@PathVariable(name = "uuid") UUID categoryUuid);
