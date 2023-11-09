@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
 import lombok.RequiredArgsConstructor;
-import org.example.core.exception.CategoryNotFoundException;
+import org.example.core.exception.EntityNotFoundException;
 import org.example.core.exception.InternalException;
 import org.example.utils.exception.DataBaseExceptionParser;
 import org.example.core.exception.dto.InternalExceptionDTO;
@@ -58,8 +58,8 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
         }
     }
 
-    @ExceptionHandler(value = CategoryNotFoundException.class)
-    public ResponseEntity<Object> handleCategoryNotFoundException(CategoryNotFoundException e, WebRequest request) {
+    @ExceptionHandler(value = EntityNotFoundException.class)
+    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException e, WebRequest request) {
         InternalExceptionDTO internalExceptionDTO = new InternalExceptionDTO(e.getMessage());
         return new ResponseEntity<>(internalExceptionDTO,HttpStatus.NOT_FOUND);
     }
