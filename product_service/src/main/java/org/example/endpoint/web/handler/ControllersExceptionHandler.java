@@ -29,11 +29,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @ControllerAdvice
 @RequiredArgsConstructor
 public class ControllersExceptionHandler extends ResponseEntityExceptionHandler {
 
+
+    private static final String DEFAULT_INTERNAL_ERROR_MESSAGE = "Some error occurred during operation";
+    private static final String NOT_UNIQUE_VALUE_MESSAGE = "You have passed not unique value of: %s";
 
     @ExceptionHandler(value = InternalException.class)
     protected ResponseEntity<Object> handleInternalException(InternalException e, WebRequest request) {
@@ -43,19 +48,19 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
 
     @ExceptionHandler(value = DuplicateKeyException.class)
     protected ResponseEntity<Object> handleDuplicateKeyException(DuplicateKeyException e, WebRequest request) {
-        InternalExceptionDTO exceptionDTO = new InternalExceptionDTO("specified name is not unique");
-        return new ResponseEntity<>(exceptionDTO, HttpStatus.BAD_REQUEST);
+        String duplicateKeyMessage = String.format(NOT_UNIQUE_VALUE_MESSAGE, getParsedDuplicateKeyName(e));
+        return new ResponseEntity<>(new InternalExceptionDTO(duplicateKeyMessage), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException e, WebRequest request) {
-        return new ResponseEntity<>(new InternalExceptionDTO("some error occurred during operation"), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new InternalExceptionDTO(DEFAULT_INTERNAL_ERROR_MESSAGE), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException e, WebRequest request) {
         InternalExceptionDTO internalExceptionDTO = new InternalExceptionDTO(e.getMessage());
-        return new ResponseEntity<>(internalExceptionDTO,HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(internalExceptionDTO, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = RequestNotFromGatewayException.class)
@@ -122,5 +127,13 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
         return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, node.getName());
     }
 
-
+    private String getParsedDuplicateKeyName(DuplicateKeyException e) {
+        String exceptionMessage = e.getMessage();
+        Matcher matcher = Pattern.compile("duplicate key.+index: (?<index>.+? )").matcher(exceptionMessage);
+        String parsedIndex = null;
+        if (matcher.find()) {
+            parsedIndex = matcher.group("index");
+        }
+        return parsedIndex == null ? "NOT RECOGNIZED" : parsedIndex;
+    }
 }
