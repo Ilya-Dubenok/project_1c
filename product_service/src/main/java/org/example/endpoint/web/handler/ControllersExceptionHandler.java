@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
 import lombok.RequiredArgsConstructor;
 import org.example.core.exception.InternalException;
-import org.example.core.exception.ProductNotFoundException;
+import org.example.core.exception.EntityNotFoundException;
 import org.example.core.exception.RequestNotFromGatewayException;
 import org.example.core.exception.dto.InternalExceptionDTO;
 import org.example.core.exception.dto.StructuredExceptionDTO;
@@ -52,8 +52,8 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
         return new ResponseEntity<>(new InternalExceptionDTO("some error occurred during operation"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(value = ProductNotFoundException.class)
-    public ResponseEntity<Object> handleProductNotFoundException(ProductNotFoundException e, WebRequest request) {
+    @ExceptionHandler(value = EntityNotFoundException.class)
+    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException e, WebRequest request) {
         InternalExceptionDTO internalExceptionDTO = new InternalExceptionDTO(e.getMessage());
         return new ResponseEntity<>(internalExceptionDTO,HttpStatus.NOT_FOUND);
     }

@@ -6,7 +6,7 @@ import org.example.core.dto.product.ProductCreateDTO;
 import org.example.core.dto.product.ProductDTO;
 import org.example.core.dto.rule.RuleDTO;
 import org.example.core.exception.InternalException;
-import org.example.core.exception.ProductNotFoundException;
+import org.example.core.exception.EntityNotFoundException;
 import org.example.dao.entities.product.IRule;
 import org.example.dao.entities.product.Item;
 import org.example.dao.entities.product.Product;
@@ -52,7 +52,7 @@ public class ProductService implements IProductService {
 
     @Override
     public ProductDTO findByName(String name) {
-        Product product = productRepository.findByName(name.toLowerCase()).orElseThrow(ProductNotFoundException::new);
+        Product product = productRepository.findByName(name.toLowerCase()).orElseThrow(() -> new EntityNotFoundException("product"));
         return mapper.map(product, ProductDTO.class);
     }
 
@@ -131,7 +131,7 @@ public class ProductService implements IProductService {
     @Override
     public void delete(UUID productUuid) {
         if (!productRepository.existsById(productUuid)) {
-            throw new ProductNotFoundException();
+            throw new EntityNotFoundException("product");
         }
         productRepository.deleteById(productUuid);
     }
@@ -154,7 +154,7 @@ public class ProductService implements IProductService {
     }
 
     private Product getProductOrThrow(UUID productUuid) {
-        return productRepository.findById(productUuid).orElseThrow(ProductNotFoundException::new);
+        return productRepository.findById(productUuid).orElseThrow(() -> new EntityNotFoundException("product"));
     }
 
     private List<Item> formListOfItems(List<ItemDTO> itemDTOList) {
