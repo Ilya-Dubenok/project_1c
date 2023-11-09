@@ -15,6 +15,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       schema: app
+
   jackson:
     property-naming-strategy: SNAKE_CASE
 
@@ -25,6 +26,17 @@ eureka:
   instance:
     preferIpAddress: true
 
+springdoc:
+  api-docs:
+    path: /category-service/v3/api-docs
+  swagger-ui:
+    path: /category-service/swagger-ui.html
+
+openapi:
+  service:
+    title: category-service-doc
+    version: 1.0.0
+    url: http://localhost/api/v1
 
 logging:
   level:
