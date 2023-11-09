@@ -1,0 +1,49 @@
+version: '3.5'
+services:
+
+  postgres_db:
+    build: postgresql
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    networks:
+      - services_ntwrk
+
+  pgadmin:
+    build: postgresql/pgadmin
+    depends_on:
+    - postgres_db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "82:80"
+    networks:
+      - services_ntwrk
+
+  eureka-server:
+    build: eureka_server
+    ports:
+      - "8761:8761"
+    networks:
+      - services_ntwrk
+
+  category_service:
+    build: category_service
+    depends_on:
+      - postgres_db
+      - eureka-server
+    environment:
+      spring.datasource.url: jdbc:postgresql://postgres_db:5432/category_service?ApplicationName=Category_Service
+      spring.datasource.username: root
+      spring.datasource.password: root
+      EUREKA_URI: http://eureka-server:8761/eureka
+    ports:
+      - "8080:8080"
+    networks:
+      - services_ntwrk
+
+networks:
+  services_ntwrk:
+    name: services_ntwrk
+

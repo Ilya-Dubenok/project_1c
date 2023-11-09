@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Project1C DB",
+      "Group": "Server Group 1",
+      "Port": 5432,
+      "Username": "root",
+      "Host": "postgres_db",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres"
+    }
+  }
+}
