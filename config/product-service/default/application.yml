@@ -8,8 +8,8 @@ spring:
 
   cloud:
     config:
-      allow-override: true
-      override-system-properties: true
+      allowOverride: true
+      overrideSystemProperties: false
     openfeign:
       circuitbreaker:
         enabled: true
