@@ -28,3 +28,10 @@ openapi:
     title: product-service-doc
     version: 1.0.0
     url: http://localhost/api/v1
+
+logging:
+  group:
+    mongo:
+      - org.springframework.data.mongodb.core.MongoTemplate
+  level:
+    mongo: DEBUG

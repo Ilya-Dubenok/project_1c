@@ -20,14 +20,3 @@ eureka:
   instance:
     preferIpAddress: true
 
-logging:
-  level:
-    org:
-      hibernate:
-        SQL:
-          DEBUG
-        orm:
-          jdbc:
-            bind:
-              Trace
-

@@ -20,10 +20,3 @@ eureka:
   instance:
     preferIpAddress: true
 
-logging:
-  group:
-    mongo:
-      - org.springframework.data.mongodb.core.MongoTemplate
-  level:
-    mongo: DEBUG
-

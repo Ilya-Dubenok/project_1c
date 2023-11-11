@@ -41,3 +41,14 @@ server:
     encoding:
       charset: UTF-8
       force: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL:
+          DEBUG
+        orm:
+          jdbc:
+            bind:
+              Trace
