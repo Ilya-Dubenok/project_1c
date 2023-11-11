@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.core.dto.category.CategoryCreateDTO;
 import org.example.core.dto.category.CategoryDTO;
 import org.example.core.dto.category.CategoryUpdateDTO;
-import org.example.core.exception.CategoryNotFoundException;
+import org.example.core.exception.EntityNotFoundException;
 import org.example.core.exception.InternalException;
 import org.example.dao.entities.Category;
 import org.example.dao.repositories.ICategoryRepository;
@@ -38,7 +38,7 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public CategoryDTO findByUUID(UUID uuid) {
-        Category category = categoryRepository.findById(uuid).orElseThrow(CategoryNotFoundException::new);
+        Category category = categoryRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("category"));
         return mapper.map(category, CategoryDTO.class);
     }
 
@@ -64,7 +64,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public CategoryDTO updateNameAndRules(UUID uuid, CategoryUpdateDTO categoryUpdateDTO) {
 
-        Category categoryToUpdate = categoryRepository.findById(uuid).orElseThrow(CategoryNotFoundException::new);
+        Category categoryToUpdate = categoryRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("category"));
         categoryToUpdate.setName(categoryUpdateDTO.getName());
         List<IRule> rules = createRuleList(categoryUpdateDTO.getRules());
         categoryToUpdate.setRules(rules);
@@ -75,7 +75,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public void delete(UUID uuid) {
         if (!categoryRepository.existsById(uuid)) {
-            throw new CategoryNotFoundException();
+            throw new EntityNotFoundException();
         }
         categoryRepository.deleteById(uuid);
     }
