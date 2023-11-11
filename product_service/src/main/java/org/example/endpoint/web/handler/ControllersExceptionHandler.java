@@ -3,6 +3,7 @@ package org.example.endpoint.web.handler;
 import lombok.RequiredArgsConstructor;
 import org.example.core.exception.InternalException;
 import org.example.core.exception.EntityNotFoundException;
+import org.example.core.exception.OtherServiceUnavailableException;
 import org.example.core.exception.RequestNotFromGatewayException;
 import org.example.core.exception.dto.InternalExceptionDTO;
 import org.example.core.exception.dto.StructuredExceptionDTO;
@@ -60,6 +61,11 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
     @ExceptionHandler(value = RequestNotFromGatewayException.class)
     public ResponseEntity<Object> handleRequestNotFromGatewayException(RequestNotFromGatewayException e, WebRequest request) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = OtherServiceUnavailableException.class)
+    protected ResponseEntity<Object> handleOtherServiceUnavailableException(OtherServiceUnavailableException e, WebRequest request) {
+        return new ResponseEntity<>(new InternalExceptionDTO("Unfortunately, the request could not be processed right now. Please, try later"), HttpStatus.BAD_REQUEST);
     }
 
     @Override
