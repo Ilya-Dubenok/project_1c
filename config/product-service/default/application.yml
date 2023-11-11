@@ -1,21 +1,13 @@
 spring:
+  config:
+    import: circuitbreaker.yml
+
   data:
     mongodb:
       uri: "mongodb://root:example@localhost:27017/project1c_db?authSource=admin"
       uuid-representation: standard
       auto-index-creation: true
       field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
-
-  cloud:
-    openfeign:
-      circuitbreaker:
-        enabled: true
-
-resilience4j:
-  timelimiter:
-    configs:
-      default:
-        timeout-duration: 2s
 
 springdoc:
   api-docs:
