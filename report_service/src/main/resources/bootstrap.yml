@@ -20,6 +20,9 @@ spring:
       auto-index-creation: true
       field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
 springdoc:
   api-docs:
     path: /report-service/v3/api-docs

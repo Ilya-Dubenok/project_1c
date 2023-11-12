@@ -56,9 +56,14 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public Map<RuleType, CategoryDTO> findCategoriesForRules(UUID startCategoryId, Set<RuleType> types) {
-        //TODO ADD LOGIC WHEN PRODUCT SERVICE IS DEFINED
-        return null;
+    public List<RuleCreateDTO> findApplicableRules(UUID startCategoryId, Set<RuleType> ruleTypes) {
+        Category category = categoryRepository.findById(startCategoryId).orElseThrow(() -> new EntityNotFoundException("category"));
+        List<RuleCreateDTO> listOfApplicableRules = new ArrayList<>();
+        while (ruleTypes.size() > 0 && null != category) {
+            listOfApplicableRules.addAll(getListOfMatchingRulesForCategory(ruleTypes, category));
+            category = category.getParent();
+        }
+        return listOfApplicableRules;
     }
 
     @Override
@@ -115,6 +120,14 @@ public class CategoryService implements ICategoryService {
                 .map(ruleCreateDTO -> mapper.map(ruleCreateDTO, IRule.class))
                 .filter(x -> ruleTypesLeft.contains(x.getRuleType()))
                 .peek(x -> ruleTypesLeft.remove(x.getRuleType()))
+                .toList();
+    }
+
+    private List<RuleCreateDTO> getListOfMatchingRulesForCategory(Set<RuleType> ruleTypeSet, Category category) {
+        return category.getRules()
+                .stream()
+                .filter(iRule -> ruleTypeSet.remove(iRule.getRuleType()))
+                .map(iRule -> mapper.map(iRule, RuleCreateDTO.class))
                 .toList();
     }
 }
