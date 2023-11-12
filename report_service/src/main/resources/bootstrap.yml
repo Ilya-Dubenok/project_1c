@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: report-service
+
+  cloud:
+    config:
+      label: report_service,dev
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+      retry:
+        initial-interval: 2000
+        max-interval: 4000
+
+  data:
+    mongodb:
+      uri: "mongodb://root:example@localhost:27017/project1c_db?authSource=admin"
+      uuid-representation: standard
+      auto-index-creation: true
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+
+springdoc:
+  api-docs:
+    path: /report-service/v3/api-docs
+  swagger-ui:
+    path: /report-service/swagger-ui.html
+
+openapi:
+  service:
+    title: report-service-doc
+    version: 1.0.0
+    url: http://localhost/api/v1
+
+logging:
+  group:
+    mongo:
+      - org.springframework.data.mongodb.core.MongoTemplate
+  level:
+    mongo: DEBUG
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    preferIpAddress: true
+
