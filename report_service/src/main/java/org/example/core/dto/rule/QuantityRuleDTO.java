@@ -1,0 +1,17 @@
+package org.example.core.dto.rule;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class QuantityRuleDTO extends RuleDTO {
+
+    private RuleType ruleType = RuleType.QUANT;
+
+    private Integer minimumQuantity;
+
+}

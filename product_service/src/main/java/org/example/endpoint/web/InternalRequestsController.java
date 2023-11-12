@@ -1,14 +1,14 @@
-package org.example.enpoint.web;
+package org.example.endpoint.web;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
-import org.example.service.api.ICategoryService;
+import org.example.core.dto.product.ProductDTO;
+import org.example.service.api.IProductService;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
+import java.util.List;
 
 @Hidden
 @RequiredArgsConstructor
@@ -16,11 +16,11 @@ import java.util.UUID;
 @RequestMapping(value = "/internal")
 public class InternalRequestsController {
 
-    private final ICategoryService categoryService;
+    private final IProductService productService;
 
-    @GetMapping(value = "/exists/{uuid}")
-    public Boolean categoryExists(@PathVariable UUID uuid) {
-        return categoryService.existsByUuid(uuid);
+    @GetMapping(value = "/all_products")
+    public List<ProductDTO> getAll() {
+        return productService.findAll();
     }
 
 }

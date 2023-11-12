@@ -57,9 +57,16 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    public List<ProductDTO> findAll() {
+        return productRepository.findAll().stream()
+                .map(product -> mapper.map(product, ProductDTO.class))
+                .toList();
+    }
+
+    @Override
     public Page<ProductDTO> getPage(Pageable pageable) {
         Page<Product> pageOfProducts = productRepository.findAll(pageable);
-        return pageOfProducts.map(category -> mapper.map(category, ProductDTO.class));
+        return pageOfProducts.map(product -> mapper.map(product, ProductDTO.class));
     }
 
     @Override

@@ -19,6 +19,8 @@ public interface IProductService {
 
     ProductDTO findByName(String name);
 
+    List<ProductDTO> findAll();
+
     Page<ProductDTO> getPage(Pageable pageable);
 
     ProductDTO updateName(UUID productUuid, String name);
