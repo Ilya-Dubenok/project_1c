@@ -20,6 +20,9 @@ public class QuantityRule implements IRule {
 
     @Override
     public Integer getQuantityOfProductsToBuy(ProductDTO product) {
+        if (minimumQuantity < 1) {
+            return 0;
+        }
         List<ItemDTO> items = product.getItems();
         int sumOfItems = 0;
         if (null != items && items.size() > 0) {
