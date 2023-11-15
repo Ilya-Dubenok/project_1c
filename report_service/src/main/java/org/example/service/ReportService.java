@@ -1,14 +1,16 @@
 package org.example.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.core.dto.category.CategoryDTO;
 import org.example.core.dto.product.ProductDTO;
-import org.example.core.dto.report.PendingProductDTO;
+import org.example.core.dto.report.ProductToBuyDTO;
 import org.example.core.dto.rule.RuleDTO;
 import org.example.core.dto.rule.RuleType;
 import org.example.service.api.ICategoryClient;
 import org.example.service.api.IProductClient;
 import org.example.service.api.IReportService;
 import org.example.service.transitional.IRule;
+import org.example.service.transitional.ProductToBuy;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -25,41 +27,65 @@ public class ReportService implements IReportService {
     private final IProductClient productClient;
 
     @Override
-    public List<PendingProductDTO> getListOfPendingProducts() {
-        List<ProductDTO> productsList = productClient.getProductsList();
-        return null;
+    public List<ProductToBuyDTO> getProductsToBuy() {
+        return productClient.getProductsList().stream()
+                .map(this::formProductToBuyWithGreaterThanZeroQuantity)
+                .filter(Optional::isPresent)
+                .map(optionalProductToBuy -> mapper.map(optionalProductToBuy.get(), ProductToBuyDTO.class))
+                .toList();
     }
 
-    //TODO change to private when finished
-    public Map<ProductDTO, Integer> getMapOfProductsToBuy(ProductDTO productDTO) {
-        Map<ProductDTO, Integer> mapOfProductsToBuy = new HashMap<>();
+    private ProductToBuy formProductToBuy(ProductDTO productDTO) {
+        ProductToBuy productToBuy = new ProductToBuy(productDTO);
+        defineQuantityToBuy(productToBuy);
+        setCategories(productToBuy);
+        return productToBuy;
+    }
+
+    private Optional<ProductToBuy> formProductToBuyWithGreaterThanZeroQuantity(ProductDTO productDTO) {
+        ProductToBuy productToBuy = new ProductToBuy(productDTO);
+        defineQuantityToBuy(productToBuy);
+        if (productToBuy.getQuantity() > 0) {
+            setCategories(productToBuy);
+            return Optional.of(productToBuy);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private void setCategories(ProductToBuy productToBuy) {
+        UUID categoryUuid = productToBuy.getProductDTO().getCategoryId();
+        List<CategoryDTO> categoryList = categoryClient.getCategoryAndParents(categoryUuid);
+        productToBuy.setCategories(categoryList);
+    }
+
+    private void defineQuantityToBuy(ProductToBuy productToBuy) {
         Set<RuleType> ruleTypesToApply = new HashSet<>(List.of(RuleType.values()));
-        fillMapByApplicableProductRules(mapOfProductsToBuy, productDTO, ruleTypesToApply);
+        applyProductRules(productToBuy, ruleTypesToApply);
         if (ruleTypesToApply.size() > 0) {
-            fillMapByApplicableCategoryRules(mapOfProductsToBuy, productDTO, ruleTypesToApply);
+            applyCategoryRules(productToBuy, ruleTypesToApply);
         }
-        return mapOfProductsToBuy;
     }
 
-    private void fillMapByApplicableProductRules(Map<ProductDTO, Integer> mapOfProductsToFill, ProductDTO productDTO, Set<RuleType> ruleTypesToApply) {
-        List<RuleDTO> productRules = productDTO.getRules();
+    private void applyProductRules(ProductToBuy productToBuy, Set<RuleType> ruleTypesToApply) {
+        List<RuleDTO> productRules = productToBuy.getProductDTO().getRules();
         if (null != productRules) {
-            fillMapByListOfRuleDTOs(mapOfProductsToFill, productDTO, ruleTypesToApply, productRules);
+            defineQuantityToBuy(productToBuy, ruleTypesToApply, productRules);
         }
     }
 
-    private void fillMapByApplicableCategoryRules(Map<ProductDTO, Integer> mapOfProductsToBuy, ProductDTO productDTO, Set<RuleType> ruleTypesToApply) {
-        List<RuleDTO> rulesApplicableFromCategories = categoryClient.getRulesApplicableFromCategories(productDTO.getCategoryId(), ruleTypesToApply);
-        fillMapByListOfRuleDTOs(mapOfProductsToBuy, productDTO, ruleTypesToApply, rulesApplicableFromCategories);
+    private void applyCategoryRules(ProductToBuy productToBuy, Set<RuleType> ruleTypesToApply) {
+        List<RuleDTO> rulesApplicableFromCategories = categoryClient.getRulesApplicableFromCategories(productToBuy.getProductDTO().getCategoryId(), ruleTypesToApply);
+        defineQuantityToBuy(productToBuy, ruleTypesToApply, rulesApplicableFromCategories);
     }
 
-    private void fillMapByListOfRuleDTOs(Map<ProductDTO, Integer> mapOfProductsToFill, ProductDTO productDTO, Set<RuleType> ruleTypesToApply, List<RuleDTO> rulesList) {
+    private void defineQuantityToBuy(ProductToBuy productToBuy, Set<RuleType> ruleTypesToApply, List<RuleDTO> rulesList) {
         rulesList.stream()
                 .map(ruleDTO -> mapper.map(ruleDTO, IRule.class))
                 .peek(iRule -> ruleTypesToApply.remove(iRule.getRuleType()))
-                .map(iRule -> iRule.getQuantityOfProductsToBuy(productDTO))
+                .map(iRule -> iRule.getQuantityOfProductsToBuy(productToBuy.getProductDTO()))
                 .filter(quantityToBuy -> quantityToBuy > 0)
-                .forEach(quantityToBuy -> mapOfProductsToFill.merge(productDTO, quantityToBuy, Integer::sum));
+                .forEach(productToBuy::addQuantity);
     }
 
 }

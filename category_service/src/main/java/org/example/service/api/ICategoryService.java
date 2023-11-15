@@ -20,6 +20,8 @@ public interface ICategoryService {
 
     List<CategoryDTO> findChildrenByParentId(UUID parentUUID);
 
+    List<CategoryDTO> findCategoryAndParents(UUID categoryUuid);
+
     Page<CategoryDTO> getPage(Pageable pageable);
 
     List<RuleCreateDTO> findApplicableRules(UUID startCategoryId, Set<RuleType> ruleTypes);

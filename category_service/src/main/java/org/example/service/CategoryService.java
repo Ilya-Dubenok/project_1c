@@ -56,6 +56,19 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
+    public List<CategoryDTO> findCategoryAndParents(UUID categoryUuid) {
+        List<CategoryDTO> parentsList = new ArrayList<>();
+        Category category = categoryRepository.findById(categoryUuid).orElseThrow(() -> new EntityNotFoundException("category"));
+        parentsList.add(mapper.map(category, CategoryDTO.class));
+        Category parent = category.getParent();
+        while (null != parent){
+            parentsList.add(mapper.map(parent, CategoryDTO.class));
+            parent = parent.getParent();
+        }
+        return parentsList;
+    }
+
+    @Override
     public List<RuleCreateDTO> findApplicableRules(UUID startCategoryId, Set<RuleType> ruleTypes) {
         Category category = categoryRepository.findById(startCategoryId).orElseThrow(() -> new EntityNotFoundException("category"));
         List<RuleCreateDTO> listOfApplicableRules = new ArrayList<>();
