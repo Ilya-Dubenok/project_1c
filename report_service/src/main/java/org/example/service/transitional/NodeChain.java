@@ -19,9 +19,7 @@ public class NodeChain {
         nodesMap.put(lowestNode.getCategory(), lowestNode);
         List<CategoryDTO> categories = productToBuy.getCategories();
         for (int i = 1; i < categories.size(); i++) {
-            topNode = new Node(categories.get(i));
-            lowestNode.addTopLevelParent(topNode);
-            nodesMap.put(topNode.getCategory(), topNode);
+            setNodesAndMapData(categories.get(i));
         }
     }
 
@@ -34,9 +32,7 @@ public class NodeChain {
             if (Objects.equals(categoryDTO, highestCategoryDTO)) {
                 return;
             }
-            topNode = new Node(categoryDTO);
-            lowestNode.addTopLevelParent(topNode);
-            nodesMap.put(topNode.getCategory(), topNode);
+            setNodesAndMapData(categoryDTO);
         }
     }
 
@@ -50,6 +46,12 @@ public class NodeChain {
         Node intersectionNode = nodesMap.get(sharedCategoryDTOOptional.get());
         mergeProductToBuyIntoIntersectionNode(intersectionNode, productToBuy);
         return true;
+    }
+
+    private void setNodesAndMapData(CategoryDTO categoryDTO) {
+        topNode = new Node(categoryDTO);
+        lowestNode.addTopLevelParent(topNode);
+        nodesMap.put(topNode.getCategory(), topNode);
     }
 
     private void mergeProductToBuyIntoIntersectionNode(Node intersectionNode, ProductToBuy productToBuy) {
