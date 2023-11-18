@@ -10,6 +10,7 @@ import org.example.service.api.ICategoryClient;
 import org.example.service.api.IProductClient;
 import org.example.service.api.IReportService;
 import org.example.service.transitional.IRule;
+import org.example.service.transitional.NodeChain;
 import org.example.service.transitional.ProductToBuy;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -27,11 +28,41 @@ public class ReportService implements IReportService {
     private final IProductClient productClient;
 
     @Override
-    public List<ProductToBuyDTO> getProductsToBuy() {
+    public List<ProductToBuyDTO> getProductsToBuyDTO() {
+        return getListOfProductsToBuy().stream()
+                .map(productToBuy -> mapper.map(productToBuy, ProductToBuyDTO.class))
+                .toList();
+    }
+
+    //TODO CHANGE RETURN TYPE TO NEW TYPE OF DATA
+    private List<NodeChain> formNodeChainList() {
+        List<ProductToBuy> listOfProductsToBuy = getListOfProductsToBuy();
+        //TODO NULL EMPTY CHECK
+        List<NodeChain> nodeChainList = formListOfNodeChains(new ArrayList<>(listOfProductsToBuy));
+        return nodeChainList;
+    }
+
+    private List<NodeChain> formListOfNodeChains(List<ProductToBuy> listOfProductsToBuy) {
+        List<NodeChain> nodeChainList = new ArrayList<>();
+        nodeChainList.add(new NodeChain(listOfProductsToBuy.remove(0)));
+        while (listOfProductsToBuy.size() > 0) {
+            ProductToBuy productToBuy = listOfProductsToBuy.remove(0);
+            if (!productToBuyIsMergedIntoNodeChain(nodeChainList, productToBuy)) {
+                nodeChainList.add(new NodeChain(productToBuy));
+            }
+        }
+        return nodeChainList;
+    }
+
+    private boolean productToBuyIsMergedIntoNodeChain(List<NodeChain> nodeChainList, ProductToBuy productToBuy) {
+        return nodeChainList.stream().anyMatch(nodeChain -> nodeChain.isProductToBuyMergedIntoChain(productToBuy));
+    }
+
+    private List<ProductToBuy> getListOfProductsToBuy() {
         return productClient.getProductsList().stream()
                 .map(this::formProductToBuyWithGreaterThanZeroQuantity)
                 .filter(Optional::isPresent)
-                .map(optionalProductToBuy -> mapper.map(optionalProductToBuy.get(), ProductToBuyDTO.class))
+                .map(Optional::get)
                 .toList();
     }
 

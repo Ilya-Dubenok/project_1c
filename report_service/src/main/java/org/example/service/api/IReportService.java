@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface IReportService {
 
-    List<ProductToBuyDTO> getProductsToBuy();
+    List<ProductToBuyDTO> getProductsToBuyDTO();
 
 }

@@ -26,4 +26,8 @@ public class ProductToBuy {
     public void addQuantity(Integer quantityToBuy) {
         this.quantity = quantity + quantityToBuy;
     }
+
+    public CategoryDTO getCategory() {
+        return categories.get(0);
+    }
 }
