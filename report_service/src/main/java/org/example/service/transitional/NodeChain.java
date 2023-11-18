@@ -8,9 +8,9 @@ import java.util.*;
 @Getter
 public class NodeChain {
 
-    private final Node lowestNode;
-
     private Node topNode;
+
+    private final Node lowestNode;
 
     private final Map<CategoryDTO, Node> nodesMap = new HashMap<>();
 

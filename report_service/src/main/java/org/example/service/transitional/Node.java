@@ -11,11 +11,11 @@ public class Node {
 
     private Node parent;
 
-    private Set<Node> children = new LinkedHashSet<>();
+    private final Set<Node> children = new LinkedHashSet<>();
 
-    private List<ProductToBuy> products = new ArrayList<>();
+    private final CategoryDTO category;
 
-    private CategoryDTO category;
+    private final List<ProductToBuy> products = new ArrayList<>();
 
     public Node(CategoryDTO categoryDTO) {
         this.category = categoryDTO;
@@ -44,7 +44,6 @@ public class Node {
         parent.addChild(currentNode);
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -57,6 +56,5 @@ public class Node {
     public int hashCode() {
         return Objects.hash(category);
     }
-
 
 }
