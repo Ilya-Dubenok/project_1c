@@ -6,6 +6,9 @@ import org.example.core.dto.product.ProductDTO;
 import org.example.core.dto.report.ProductToBuyDTO;
 import org.example.core.dto.rule.RuleDTO;
 import org.example.core.dto.rule.RuleType;
+import org.example.dao.entities.Report;
+import org.example.dao.entities.ReportData;
+import org.example.dao.repository.IReportRepository;
 import org.example.service.api.ICategoryClient;
 import org.example.service.api.IProductClient;
 import org.example.service.api.IReportService;
@@ -15,6 +18,7 @@ import org.example.service.transitional.ProductToBuy;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -27,6 +31,8 @@ public class ReportService implements IReportService {
 
     private final IProductClient productClient;
 
+    private final IReportRepository reportRepository;
+
     @Override
     public List<ProductToBuyDTO> getProductsToBuyDTO() {
         return getListOfProductsToBuy().stream()
@@ -35,11 +41,20 @@ public class ReportService implements IReportService {
     }
 
     //TODO CHANGE RETURN TYPE TO NEW TYPE OF DATA
-    private List<NodeChain> formNodeChainList() {
+    @Override
+    public Report formReport() {
+        List<ReportData> data = formReportData();
+        Report report = new Report(UUID.randomUUID(), LocalDateTime.now(), data);
+        return reportRepository.save(report);
+    }
+
+    private List<ReportData> formReportData() {
         List<ProductToBuy> listOfProductsToBuy = getListOfProductsToBuy();
         //TODO NULL EMPTY CHECK
         List<NodeChain> nodeChainList = formListOfNodeChains(new ArrayList<>(listOfProductsToBuy));
-        return nodeChainList;
+        return nodeChainList.stream()
+                .map(nodeChain -> mapper.map(nodeChain.getTopNode(), ReportData.class))
+                .toList();
     }
 
     private List<NodeChain> formListOfNodeChains(List<ProductToBuy> listOfProductsToBuy) {
