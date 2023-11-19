@@ -2,8 +2,10 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.core.dto.category.CategoryDTO;
+import org.example.core.dto.exception.EntityNotFoundException;
 import org.example.core.dto.product.ProductDTO;
 import org.example.core.dto.report.ProductToBuyDTO;
+import org.example.core.dto.report.ReportDTO;
 import org.example.core.dto.rule.RuleDTO;
 import org.example.core.dto.rule.RuleType;
 import org.example.dao.entities.Report;
@@ -41,10 +43,16 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public Report formReport() {
+    public ReportDTO formReport() {
         List<ReportData> data = formReportData();
         Report report = new Report(UUID.randomUUID(), LocalDateTime.now(), data);
-        return reportRepository.save(report);
+        return mapper.map(reportRepository.save(report), ReportDTO.class);
+    }
+
+    @Override
+    public ReportDTO gerReport(UUID uuid) {
+        Report report = reportRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("report"));
+        return mapper.map(report, ReportDTO.class);
     }
 
     private List<ReportData> formReportData() {

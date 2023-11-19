@@ -1,9 +1,12 @@
 package org.example.config;
 
 import org.example.core.dto.report.ProductToBuyDTO;
+import org.example.core.dto.report.ReportDTO;
+import org.example.core.dto.report.ReportDataDTO;
 import org.example.core.dto.rule.ExpirationRuleDTO;
 import org.example.core.dto.rule.QuantityRuleDTO;
 import org.example.dao.entities.ProductData;
+import org.example.dao.entities.Report;
 import org.example.dao.entities.ReportData;
 import org.example.service.transitional.*;
 import org.modelmapper.AbstractConverter;
@@ -65,6 +68,9 @@ public class ModelMapperConfig {
                         return source.stream().map(node -> modelMapper().map(node, ReportData.class)).toList();
                     }
                 }).map(Node::getChildren, ReportData::setInnerDataList));
+
+        modelMapper.createTypeMap(ReportData.class, ReportDataDTO.class)
+                .addMapping(ReportData::getInnerDataList, ReportDataDTO::setSubcategories);
 
         return modelMapper;
     }

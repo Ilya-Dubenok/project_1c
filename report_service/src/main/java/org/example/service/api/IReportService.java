@@ -1,13 +1,16 @@
 package org.example.service.api;
 
 import org.example.core.dto.report.ProductToBuyDTO;
-import org.example.dao.entities.Report;
+import org.example.core.dto.report.ReportDTO;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IReportService {
 
     List<ProductToBuyDTO> getProductsToBuyDTO();
 
-    Report formReport();
+    ReportDTO formReport();
+
+    ReportDTO gerReport(UUID uuid);
 }
