@@ -40,7 +40,6 @@ public class ReportService implements IReportService {
                 .toList();
     }
 
-    //TODO CHANGE RETURN TYPE TO NEW TYPE OF DATA
     @Override
     public Report formReport() {
         List<ReportData> data = formReportData();
