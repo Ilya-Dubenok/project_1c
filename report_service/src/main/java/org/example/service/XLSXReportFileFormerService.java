@@ -1,17 +1,17 @@
 package org.example.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.core.dto.report.ReportDTO;
 import org.example.core.dto.report.ReportDataDTO;
 import org.example.dao.entities.CategoryData;
 import org.example.dao.entities.ProductData;
 import org.example.service.api.IXLSXReportFileFormerService;
+import org.example.service.utils.WrittenDataContainer;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -38,44 +38,48 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("report");
         List<ReportDataDTO> data = reportDTO.getData();
-        fillReportWithAllData(workbook, sheet, data, 0, 0);
+        fillReportWithAllData(sheet, data, 0, 0);
         return workbook;
-
     }
 
-    private void fillReportWithAllData(Workbook workbook, Sheet sheet, List<ReportDataDTO> data, int rowNum, int columnNum) {
+    private void fillReportWithAllData(Sheet sheet, List<ReportDataDTO> data, int startRow, int startColumn) {
         for (ReportDataDTO reportDataDTO : data) {
-            CellAddress lastActiveCell = writeReportData(workbook, sheet, reportDataDTO, rowNum, columnNum);
-            rowNum = lastActiveCell.getRow() + 2;
+            WrittenDataContainer writtenDataContainer = formDataContainerForWorkbook(sheet);
+            CellAddress lastActiveCell = writeReportData(sheet, writtenDataContainer, reportDataDTO, startRow, startColumn);
+            setStyleAndAlignData(sheet, writtenDataContainer, lastActiveCell, startRow);
+            startRow = lastActiveCell.getRow() + 2;
         }
     }
 
-    private CellAddress writeReportData(Workbook workbook, Sheet sheet, ReportDataDTO reportDataDTO, int rowNum, int columnNum) {
-        CellAddress lastActiveCell = writeCategoryWithProductsAsBlock(workbook, sheet, reportDataDTO.getCategory(), reportDataDTO.getProducts(), rowNum, columnNum);
+    private CellAddress writeReportData(Sheet sheet, WrittenDataContainer writtenDataContainer, ReportDataDTO reportDataDTO, int rowNum, int columnNum) {
+        CellAddress lastActiveCell = writeCategoryWithProductsAsBlock(sheet, writtenDataContainer, reportDataDTO.getCategory(), reportDataDTO.getProducts(), rowNum, columnNum);
         List<ReportDataDTO> innerDataList = reportDataDTO.getSubcategories();
         if (null != innerDataList && !innerDataList.isEmpty()) {
             columnNum = columnNum + 1;
             for (ReportDataDTO innerData : innerDataList) {
-                lastActiveCell = writeReportData(workbook, sheet, innerData, lastActiveCell.getRow() + 1, columnNum);
+                lastActiveCell = writeReportData(sheet, writtenDataContainer, innerData, lastActiveCell.getRow() + 1, columnNum);
             }
         }
+        sheet.groupRow(rowNum + 1, lastActiveCell.getRow());
         return lastActiveCell;
     }
 
-    private CellAddress writeCategoryWithProductsAsBlock(Workbook workbook, Sheet sheet, CategoryData categoryData, List<ProductData> productDataList, int rowNum, int columnNum) {
-        Cell categoryNameRowCell = sheet.createRow(rowNum++).createCell(columnNum);
-        categoryNameRowCell.setCellValue(categoryData.getName());
-        CellAddress cellAddress = new CellAddress(categoryNameRowCell);
-
+    private CellAddress writeCategoryWithProductsAsBlock(Sheet sheet, WrittenDataContainer writtenDataContainer, CategoryData categoryData, List<ProductData> productDataList, int rowNum, int columnNum) {
+        Row categoryRow = sheet.createRow(rowNum++);
+        writtenDataContainer.getCategoryRows().add(categoryRow);
+        Cell cagegoryCell = categoryRow.createCell(columnNum);
+        cagegoryCell.setCellValue(categoryData.getName());
+        CellAddress cellAddress = new CellAddress(cagegoryCell);
         if (null != productDataList && !productDataList.isEmpty()) {
             for (ProductData productData : productDataList) {
-                cellAddress = writeProductData(workbook, sheet, productData, rowNum++, columnNum);
+                cellAddress = writeProductData(sheet, productData, rowNum++, columnNum);
+                writtenDataContainer.getProductRows().add(sheet.getRow(cellAddress.getRow()));
             }
         }
         return cellAddress;
     }
 
-    private CellAddress writeProductData(Workbook workbook, Sheet sheet, ProductData productData, int rowNum, int columnNum) {
+    private CellAddress writeProductData(Sheet sheet, ProductData productData, int rowNum, int columnNum) {
         Row productRow = sheet.createRow(rowNum);
         productRow.createCell(columnNum).setCellValue(productData.getName());
         Cell productQuantityCell = productRow.createCell(columnNum + 1);
@@ -83,4 +87,74 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
         return productQuantityCell.getAddress();
     }
 
+    private void setStyleAndAlignData(Sheet sheet, WrittenDataContainer writtenDataContainer, CellAddress lastActiveCell, int startRow) {
+        int rightmostColumnNum = findRightmostColumnNum(startRow, lastActiveCell.getRow(), sheet);
+        writtenDataContainer.getCategoryRows().forEach(row -> {
+            setCategoryRowStyle(writtenDataContainer, row);
+            alignCategoryRowToRightColumn(sheet, row, rightmostColumnNum);
+        });
+
+        //TODO change logic to handle product cells moving
+
+        writtenDataContainer.getProductRows().forEach(row -> {
+            setProductRowStyle(writtenDataContainer, row);
+        });
+
+    }
+
+    private void setCategoryRowStyle(WrittenDataContainer writtenDataContainer, Row row) {
+        CellStyle cellStyle = writtenDataContainer.getCategoryRowsStyle();
+        Cell cell = row.getCell(row.getFirstCellNum());
+        cell.setCellStyle(cellStyle);
+    }
+
+    private void setProductRowStyle(WrittenDataContainer writtenDataContainer, Row row) {
+        CellStyle cellStyle = writtenDataContainer.getProductRowsStyle();
+        Cell cell = row.getCell(row.getFirstCellNum());
+        cell.setCellStyle(cellStyle);
+    }
+
+
+    private int findRightmostColumnNum(int startRow, int endRow, Sheet sheet) {
+        int rightmostColumnNum = 0;
+        for (int i = startRow; i <= endRow; i++) {
+            Row currentRow = sheet.getRow(i);
+            rightmostColumnNum = Math.max(rightmostColumnNum, currentRow.getLastCellNum() - 1);
+        }
+        return rightmostColumnNum;
+    }
+
+    private void alignCategoryRowToRightColumn(Sheet sheet, Row row, int rightmostColumnNum) {
+        sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), row.getFirstCellNum(), rightmostColumnNum));
+    }
+
+    private void alignProductRowToRightColumn(Sheet sheet, Row row, int rightmostColumnNum) {
+        //TODO add logic
+        Cell cell = row.getCell(row.getFirstCellNum());
+    }
+
+    private WrittenDataContainer formDataContainerForWorkbook(Sheet sheet) {
+        Workbook workbook = sheet.getWorkbook();
+        CellStyle categoryRowStyle = formCategoryRowStyle(workbook);
+        CellStyle productRowStyle = formProductRowStyle(workbook);
+        return new WrittenDataContainer(categoryRowStyle, productRowStyle);
+    }
+
+    private CellStyle formCategoryRowStyle(Workbook workbook) {
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        return cellStyle;
+    }
+
+    private CellStyle formProductRowStyle(Workbook workbook) {
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setFillForegroundColor(new XSSFColor(new byte[]{(byte) 181, (byte) 198, (byte) 255}));
+        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        return cellStyle;
+    }
 }
