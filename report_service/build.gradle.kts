@@ -39,6 +39,7 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     implementation("org.modelmapper:modelmapper:3.2.0")
+    implementation("org.apache.poi:poi-ooxml:5.2.4")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
