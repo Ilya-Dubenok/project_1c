@@ -37,58 +37,75 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
     private Workbook formWorkbookForReport(ReportDTO reportDTO) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("report");
-        List<ReportDataDTO> data = reportDTO.getData();
-        fillReportWithAllData(sheet, data, 0, 0);
+        writeCoreReportData(sheet, reportDTO, 0, 0);
+        addMetaInfoToReport(sheet, reportDTO, 3);
         return workbook;
     }
 
-    private void fillReportWithAllData(Sheet sheet, List<ReportDataDTO> data, int startRow, int startColumn) {
-        CellAddress lastActiveCell = null;
-        for (ReportDataDTO reportDataDTO : data) {
+    private void writeCoreReportData(Sheet sheet, ReportDTO reportDTO, int startRow, int startColumn) {
+        for (ReportDataDTO reportDataDTO : reportDTO.getData()) {
             WrittenDataContainer writtenDataContainer = createDataContainerForWorkbook(sheet);
-            lastActiveCell = writeReportData(sheet, writtenDataContainer, reportDataDTO, startRow, startColumn);
-            setStyleAndAlignColumns(sheet, writtenDataContainer, lastActiveCell, startRow);
-            startRow = lastActiveCell.getRow() + 2;
+            writeReportData(sheet, writtenDataContainer, reportDataDTO, startRow, startColumn);
+            setStyleAndAlignColumns(sheet, writtenDataContainer, sheet.getActiveCell(), startRow);
+            startRow = sheet.getActiveCell().getRow() + 2;
         }
-        if (lastActiveCell != null) {
-            autoSizeAllColumns(sheet, startColumn, lastActiveCell.getColumn());
-        }
+        autoSizeAllColumns(sheet, startColumn, sheet.getActiveCell().getColumn());
     }
 
-    private CellAddress writeReportData(Sheet sheet, WrittenDataContainer writtenDataContainer, ReportDataDTO reportDataDTO, int rowNum, int columnNum) {
-        CellAddress lastActiveCell = writeCategoryWithProductsAsBlock(sheet, writtenDataContainer, reportDataDTO.getCategory(), reportDataDTO.getProducts(), rowNum, columnNum);
+    private void writeReportData(Sheet sheet, WrittenDataContainer writtenDataContainer, ReportDataDTO reportDataDTO, int rowNum, int columnNum) {
+        writeCategoryWithProductsAsBlock(sheet, writtenDataContainer, reportDataDTO.getCategory(), reportDataDTO.getProducts(), rowNum, columnNum);
         List<ReportDataDTO> innerDataList = reportDataDTO.getSubcategories();
         if (null != innerDataList && !innerDataList.isEmpty()) {
             columnNum++;
             for (ReportDataDTO innerData : innerDataList) {
-                lastActiveCell = writeReportData(sheet, writtenDataContainer, innerData, lastActiveCell.getRow() + 1, columnNum);
+                writeReportData(sheet, writtenDataContainer, innerData, sheet.getActiveCell().getRow() + 1, columnNum);
             }
         }
-        sheet.groupRow(rowNum + 1, lastActiveCell.getRow());
-        return lastActiveCell;
+        sheet.groupRow(rowNum + 1, sheet.getActiveCell().getRow());
     }
 
-    private CellAddress writeCategoryWithProductsAsBlock(Sheet sheet, WrittenDataContainer writtenDataContainer, CategoryData categoryData, List<ProductData> productDataList, int rowNum, int columnNum) {
+    private void writeCategoryWithProductsAsBlock(Sheet sheet, WrittenDataContainer writtenDataContainer, CategoryData categoryData, List<ProductData> productDataList, int rowNum, int columnNum) {
         Row categoryRow = sheet.createRow(rowNum++);
         writtenDataContainer.getCategoryRows().add(categoryRow);
-        Cell cagegoryCell = categoryRow.createCell(columnNum);
-        cagegoryCell.setCellValue(categoryData.getName());
-        CellAddress cellAddress = new CellAddress(cagegoryCell);
+        createCellAndSetStringValue(categoryRow, columnNum, categoryData.getName());
         if (null != productDataList && !productDataList.isEmpty()) {
             for (ProductData productData : productDataList) {
-                cellAddress = writeProductData(sheet, productData, rowNum++, columnNum);
-                writtenDataContainer.getProductRows().add(sheet.getRow(cellAddress.getRow()));
+                writeProductData(sheet, productData, rowNum++, columnNum);
+                writtenDataContainer.getProductRows().add(sheet.getRow(sheet.getActiveCell().getRow()));
             }
         }
-        return cellAddress;
     }
 
     private CellAddress writeProductData(Sheet sheet, ProductData productData, int rowNum, int columnNum) {
         Row productRow = sheet.createRow(rowNum);
-        productRow.createCell(columnNum).setCellValue(productData.getName());
-        Cell productQuantityCell = productRow.createCell(columnNum + 1);
-        productQuantityCell.setCellValue(productData.getQuantity());
-        return productQuantityCell.getAddress();
+        createCellAndSetStringValue(productRow, columnNum, productData.getName());
+        createCellAndSetIntegerValue(productRow, columnNum + 1, productData.getQuantity());
+        return sheet.getActiveCell();
+    }
+
+    private void createCellAndSetStringValue(Row row, int column, String value) {
+        Cell cell = row.createCell(column);
+        cell.setCellValue(value);
+        row.getSheet().setActiveCell(new CellAddress(cell.getAddress()));
+    }
+
+    private void createCellAndSetIntegerValue(Row row, int column, Integer value) {
+        Cell cell = row.createCell(column);
+        cell.setCellValue(value);
+        row.getSheet().setActiveCell(new CellAddress(cell.getAddress()));
+    }
+
+    private void addMetaInfoToReport(Sheet sheet, ReportDTO reportDTO, int rightOffset) {
+        int metaInfoStartColumn = sheet.getActiveCell().getColumn() + rightOffset;
+
+        Row uuidRow = sheet.getRow(0);
+        createCellAndSetStringValue(uuidRow, metaInfoStartColumn, "UUID: ");
+        createCellAndSetStringValue(uuidRow, metaInfoStartColumn + 1, reportDTO.getUuid().toString());
+        Row formedOnRow = sheet.getRow(1);
+        createCellAndSetStringValue(formedOnRow, metaInfoStartColumn, "Formed on: ");
+        createCellAndSetStringValue(formedOnRow, metaInfoStartColumn + 1, reportDTO.getFormedOn().toString());
+
+        autoSizeAllColumns(sheet, metaInfoStartColumn, metaInfoStartColumn + 1);
     }
 
     private void setStyleAndAlignColumns(Sheet sheet, WrittenDataContainer writtenDataContainer, CellAddress lastActiveCell, int startRow) {
@@ -125,7 +142,7 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
     }
 
     private void alignProductRowToRightColumn(Row row, int rightmostColumnNum) {
-        Cell quantityCell = row.getCell(row.getLastCellNum()-1);
+        Cell quantityCell = row.getCell(row.getLastCellNum() - 1);
         if (quantityCell.getColumnIndex() < rightmostColumnNum) {
             moveSingleCellDataToTargetColumn(quantityCell, rightmostColumnNum);
             mergeCellsForSingleRow(row, row.getFirstCellNum(), rightmostColumnNum - 1);
