@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.core.dto.report.ReportDTO;
@@ -44,9 +45,9 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
 
     private void fillReportWithAllData(Sheet sheet, List<ReportDataDTO> data, int startRow, int startColumn) {
         for (ReportDataDTO reportDataDTO : data) {
-            WrittenDataContainer writtenDataContainer = formDataContainerForWorkbook(sheet);
+            WrittenDataContainer writtenDataContainer = createDataContainerForWorkbook(sheet);
             CellAddress lastActiveCell = writeReportData(sheet, writtenDataContainer, reportDataDTO, startRow, startColumn);
-            setStyleAndAlignData(sheet, writtenDataContainer, lastActiveCell, startRow);
+            setStyleAndAlignColumns(sheet, writtenDataContainer, lastActiveCell, startRow);
             startRow = lastActiveCell.getRow() + 2;
         }
     }
@@ -87,16 +88,17 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
         return productQuantityCell.getAddress();
     }
 
-    private void setStyleAndAlignData(Sheet sheet, WrittenDataContainer writtenDataContainer, CellAddress lastActiveCell, int startRow) {
+    private void setStyleAndAlignColumns(Sheet sheet, WrittenDataContainer writtenDataContainer, CellAddress lastActiveCell, int startRow) {
         int rightmostColumnNum = findRightmostColumnNum(startRow, lastActiveCell.getRow(), sheet);
         writtenDataContainer.getCategoryRows().forEach(row -> {
             setCategoryRowStyle(writtenDataContainer, row);
-            alignCategoryRowToRightColumn(sheet, row, rightmostColumnNum);
+            mergeCellsForSingleRow(row, row.getFirstCellNum(), rightmostColumnNum);
         });
 
         //TODO change logic to handle product cells moving
 
         writtenDataContainer.getProductRows().forEach(row -> {
+            alignProductRowToRightColumn(sheet, row, rightmostColumnNum);
             setProductRowStyle(writtenDataContainer, row);
         });
 
@@ -114,7 +116,6 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
         cell.setCellStyle(cellStyle);
     }
 
-
     private int findRightmostColumnNum(int startRow, int endRow, Sheet sheet) {
         int rightmostColumnNum = 0;
         for (int i = startRow; i <= endRow; i++) {
@@ -124,16 +125,26 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
         return rightmostColumnNum;
     }
 
-    private void alignCategoryRowToRightColumn(Sheet sheet, Row row, int rightmostColumnNum) {
-        sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), row.getFirstCellNum(), rightmostColumnNum));
-    }
-
     private void alignProductRowToRightColumn(Sheet sheet, Row row, int rightmostColumnNum) {
-        //TODO add logic
-        Cell cell = row.getCell(row.getFirstCellNum());
+        Cell quantityCell = row.getCell(row.getLastCellNum()-1);
+        if (quantityCell.getColumnIndex() < rightmostColumnNum) {
+            moveSingleCellDataToTargetColumn(quantityCell, rightmostColumnNum);
+            mergeCellsForSingleRow(row, row.getFirstCellNum(), rightmostColumnNum - 1);
+        }
     }
 
-    private WrittenDataContainer formDataContainerForWorkbook(Sheet sheet) {
+    private void mergeCellsForSingleRow(Row row, int firstColumnNum, int lastColumnNum) {
+        int rowNum = row.getRowNum();
+        row.getSheet().addMergedRegion(new CellRangeAddress(rowNum, rowNum, firstColumnNum, lastColumnNum));
+    }
+
+    private void moveSingleCellDataToTargetColumn(Cell cell, int targetColumnNum) {
+        Cell targetCell = cell.getRow().createCell(targetColumnNum);
+        CellUtil.copyCell(cell, targetCell, new CellCopyPolicy(), null);
+        cell.setBlank();
+    }
+
+    private WrittenDataContainer createDataContainerForWorkbook(Sheet sheet) {
         Workbook workbook = sheet.getWorkbook();
         CellStyle categoryRowStyle = formCategoryRowStyle(workbook);
         CellStyle productRowStyle = formProductRowStyle(workbook);
