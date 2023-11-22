@@ -30,7 +30,6 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
             workbook.write(byteArrayOutputStream);
             return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
-            //TODO CHANGE HANDLING
             throw new RuntimeException(e);
         }
     }
@@ -44,11 +43,15 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
     }
 
     private void fillReportWithAllData(Sheet sheet, List<ReportDataDTO> data, int startRow, int startColumn) {
+        CellAddress lastActiveCell = null;
         for (ReportDataDTO reportDataDTO : data) {
             WrittenDataContainer writtenDataContainer = createDataContainerForWorkbook(sheet);
-            CellAddress lastActiveCell = writeReportData(sheet, writtenDataContainer, reportDataDTO, startRow, startColumn);
+            lastActiveCell = writeReportData(sheet, writtenDataContainer, reportDataDTO, startRow, startColumn);
             setStyleAndAlignColumns(sheet, writtenDataContainer, lastActiveCell, startRow);
             startRow = lastActiveCell.getRow() + 2;
+        }
+        if (lastActiveCell != null) {
+            autoSizeAllColumns(sheet, startColumn, lastActiveCell.getColumn());
         }
     }
 
@@ -56,7 +59,7 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
         CellAddress lastActiveCell = writeCategoryWithProductsAsBlock(sheet, writtenDataContainer, reportDataDTO.getCategory(), reportDataDTO.getProducts(), rowNum, columnNum);
         List<ReportDataDTO> innerDataList = reportDataDTO.getSubcategories();
         if (null != innerDataList && !innerDataList.isEmpty()) {
-            columnNum = columnNum + 1;
+            columnNum++;
             for (ReportDataDTO innerData : innerDataList) {
                 lastActiveCell = writeReportData(sheet, writtenDataContainer, innerData, lastActiveCell.getRow() + 1, columnNum);
             }
@@ -94,14 +97,19 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
             setCategoryRowStyle(writtenDataContainer, row);
             mergeCellsForSingleRow(row, row.getFirstCellNum(), rightmostColumnNum);
         });
-
-        //TODO change logic to handle product cells moving
-
         writtenDataContainer.getProductRows().forEach(row -> {
-            alignProductRowToRightColumn(sheet, row, rightmostColumnNum);
+            alignProductRowToRightColumn(row, rightmostColumnNum);
             setProductRowStyle(writtenDataContainer, row);
         });
+    }
 
+    private int findRightmostColumnNum(int startRow, int endRow, Sheet sheet) {
+        int rightmostColumnNum = 0;
+        for (int i = startRow; i <= endRow; i++) {
+            Row currentRow = sheet.getRow(i);
+            rightmostColumnNum = Math.max(rightmostColumnNum, currentRow.getLastCellNum() - 1);
+        }
+        return rightmostColumnNum;
     }
 
     private void setCategoryRowStyle(WrittenDataContainer writtenDataContainer, Row row) {
@@ -116,16 +124,7 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
         cell.setCellStyle(cellStyle);
     }
 
-    private int findRightmostColumnNum(int startRow, int endRow, Sheet sheet) {
-        int rightmostColumnNum = 0;
-        for (int i = startRow; i <= endRow; i++) {
-            Row currentRow = sheet.getRow(i);
-            rightmostColumnNum = Math.max(rightmostColumnNum, currentRow.getLastCellNum() - 1);
-        }
-        return rightmostColumnNum;
-    }
-
-    private void alignProductRowToRightColumn(Sheet sheet, Row row, int rightmostColumnNum) {
+    private void alignProductRowToRightColumn(Row row, int rightmostColumnNum) {
         Cell quantityCell = row.getCell(row.getLastCellNum()-1);
         if (quantityCell.getColumnIndex() < rightmostColumnNum) {
             moveSingleCellDataToTargetColumn(quantityCell, rightmostColumnNum);
@@ -142,6 +141,12 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
         Cell targetCell = cell.getRow().createCell(targetColumnNum);
         CellUtil.copyCell(cell, targetCell, new CellCopyPolicy(), null);
         cell.setBlank();
+    }
+
+    private void autoSizeAllColumns(Sheet sheet, int startColumn, int endColum) {
+        for (int i = startColumn; i <= endColum; i++) {
+            sheet.autoSizeColumn(i, true);
+        }
     }
 
     private WrittenDataContainer createDataContainerForWorkbook(Sheet sheet) {
