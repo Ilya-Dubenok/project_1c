@@ -12,7 +12,7 @@ import org.example.dao.entities.product.Item;
 import org.example.dao.entities.product.Product;
 import org.example.dao.entities.product.RuleType;
 import org.example.dao.repository.IProductRepository;
-import org.example.service.api.ICategoryClient;
+import org.example.service.api.client.ICategoryClient;
 import org.example.service.api.IProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
