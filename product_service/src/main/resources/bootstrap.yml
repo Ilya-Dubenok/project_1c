@@ -1,10 +1,10 @@
 spring:
   application:
-    name: category-service
+    name: product-service
 
   cloud:
     config:
-      label: config_server,dev
+      label: product_service,dev
       discovery:
         enabled: true
         service-id: config-server

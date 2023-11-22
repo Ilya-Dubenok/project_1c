@@ -28,5 +28,5 @@ public interface ICategoryService {
 
     void delete(UUID uuid);
 
-
+    Boolean existsByUuid(UUID uuid);
 }

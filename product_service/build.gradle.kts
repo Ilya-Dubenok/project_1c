@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    id("java")
+    java
     id("org.springframework.boot") version "3.1.5"
     id("io.spring.dependency-management") version "1.1.3"
     id("org.springdoc.openapi-gradle-plugin") version "1.8.0"
@@ -27,21 +27,21 @@ repositories {
 extra["springCloudVersion"] = "2022.0.4"
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-aop")
-    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+    implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
     implementation("org.springframework.retry:spring-retry")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("com.google.guava:guava:11.0.2")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     implementation("org.modelmapper:modelmapper:3.2.0")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 dependencyManagement {
@@ -50,8 +50,7 @@ dependencyManagement {
     }
 }
 
-
-tasks.test {
+tasks.withType<Test> {
     useJUnitPlatform()
 }
 

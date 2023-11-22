@@ -1,4 +1,9 @@
 spring:
+  cloud:
+    config:
+      allowOverride: true
+      overrideSystemProperties: false
+
   jpa:
     generate-ddl: false
     properties:
@@ -41,3 +46,14 @@ server:
     encoding:
       charset: UTF-8
       force: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL:
+          DEBUG
+        orm:
+          jdbc:
+            bind:
+              Trace
