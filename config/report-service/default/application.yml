@@ -1,0 +1,43 @@
+spring:
+  data:
+    mongodb:
+      uri: "mongodb://root:example@localhost:27017/project1c_db?authSource=admin"
+      uuid-representation: standard
+      auto-index-creation: true
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+
+  cloud:
+    config:
+      allowOverride: true
+      overrideSystemProperties: false
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+resilience4j:
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 2s
+
+springdoc:
+  api-docs:
+    path: /report-service/v3/api-docs
+  swagger-ui:
+    path: /report-service/swagger-ui.html
+
+openapi:
+  service:
+    title: report-service-doc
+    version: 1.0.0
+    url: http://localhost/api/v1
+
+logging:
+  group:
+    mongo:
+      - org.springframework.data.mongodb.core.MongoTemplate
+  level:
+    mongo: DEBUG
