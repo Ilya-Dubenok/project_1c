@@ -34,6 +34,10 @@ public class GatewayConfig {
                         .filters(replaceSegmentAndAddHeaderFunction)
                         .uri("lb://product-service")
                 )
+                .route("report_service_route", r -> r.path("/api/v1/report/**", "/report-service/v3/api-docs")
+                        .filters(replaceSegmentAndAddHeaderFunction)
+                        .uri("lb://report-service")
+                )
                 .build();
     }
 
