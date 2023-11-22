@@ -57,7 +57,9 @@ public class ReportService implements IReportService {
 
     private List<ReportData> formReportData() {
         List<ProductToBuy> listOfProductsToBuy = getListOfProductsToBuy();
-        //TODO NULL EMPTY CHECK
+        if (null == listOfProductsToBuy || listOfProductsToBuy.isEmpty()) {
+            return new ArrayList<>();
+        }
         List<NodeChain> nodeChainList = formListOfNodeChains(new ArrayList<>(listOfProductsToBuy));
         return nodeChainList.stream()
                 .map(nodeChain -> mapper.map(nodeChain.getTopNode(), ReportData.class))
