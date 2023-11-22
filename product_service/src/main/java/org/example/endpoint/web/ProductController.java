@@ -102,7 +102,7 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PatchMapping("/{uuid}/name/{name}")
+    @PutMapping("/{uuid}/name/{name}")
     public ProductDTO updateName(@PathVariable UUID uuid, @PathVariable String name) {
         return productService.updateName(uuid, name);
     }
@@ -115,7 +115,7 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PatchMapping("/{uuid}/rules")
+    @PutMapping("/{uuid}/rules")
     public ProductDTO updateRules(@PathVariable(name = "uuid") UUID uuid, @Valid @RequestBody List<RuleDTO> ruleDTOList) {
         return productService.updateRules(uuid, ruleDTOList);
     }
@@ -128,7 +128,7 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PatchMapping("/{uuid}/items")
+    @PutMapping("/{uuid}/items")
     public ProductDTO updateItems(@PathVariable UUID uuid, @Valid @RequestBody List<ItemDTO> itemDTOList) {
         return productService.updateItems(uuid, itemDTOList);
     }
@@ -154,7 +154,7 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PatchMapping("/{uuid}/items/add")
+    @PutMapping("/{uuid}/items/add")
     public ProductDTO addToItemQuantity(@PathVariable UUID uuid,
                                         @RequestParam(name = "expires_at", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate expiresAt,
                                         @RequestParam(name = "summand") Integer summand) {
@@ -169,7 +169,7 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PatchMapping("/{uuid}/items/expiration")
+    @PutMapping("/{uuid}/items/expiration")
     public ProductDTO changeItemExpirationDate(@PathVariable UUID uuid,
                                                @RequestParam(name = "expires_at", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate expiresAt,
                                                @RequestParam(name = "new_date", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate replacement) {

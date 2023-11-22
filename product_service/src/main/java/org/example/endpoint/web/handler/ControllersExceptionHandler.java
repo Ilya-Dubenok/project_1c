@@ -1,5 +1,9 @@
 package org.example.endpoint.web.handler;
 
+import com.google.common.base.CaseFormat;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
 import lombok.RequiredArgsConstructor;
 import org.example.core.exception.InternalException;
 import org.example.core.exception.EntityNotFoundException;
@@ -23,6 +27,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -45,6 +50,13 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
     protected ResponseEntity<Object> handleDuplicateKeyException(DuplicateKeyException e, WebRequest request) {
         String duplicateKeyMessage = String.format(NOT_UNIQUE_VALUE_MESSAGE, getParsedDuplicateKeyName(e));
         return new ResponseEntity<>(new InternalExceptionDTO(duplicateKeyMessage), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e, WebRequest request) {
+        StructuredExceptionDTO structuredExceptionDTO = new StructuredExceptionDTO();
+        fillStructuredExceptionDTOFromConstraintViolationException(structuredExceptionDTO, e);
+        return new ResponseEntity<>(structuredExceptionDTO, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = DataIntegrityViolationException.class)
@@ -104,5 +116,25 @@ public class ControllersExceptionHandler extends ResponseEntityExceptionHandler 
             parsedIndex = matcher.group("index");
         }
         return parsedIndex == null ? "NOT RECOGNIZED" : parsedIndex;
+    }
+
+    private void fillStructuredExceptionDTOFromConstraintViolationException(StructuredExceptionDTO structuredExceptionDTO, ConstraintViolationException e) {
+        Iterator<ConstraintViolation<?>> iterator = e.getConstraintViolations().iterator();
+        while (iterator.hasNext()) {
+            ConstraintViolation<?> constraintViolation = iterator.next();
+            String propname = parseForPropNameInSnakeCase(constraintViolation);
+            String message = constraintViolation.getMessage();
+            structuredExceptionDTO.getPayload().put(propname, message);
+        }
+    }
+
+    private String parseForPropNameInSnakeCase(ConstraintViolation<?> next) {
+        Path propertyPath = next.getPropertyPath();
+        Iterator<Path.Node> iterator = propertyPath.iterator();
+        Path.Node node = null;
+        while (iterator.hasNext()) {
+            node = iterator.next();
+        }
+        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, node.getName());
     }
 }

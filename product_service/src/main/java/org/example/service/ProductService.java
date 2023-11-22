@@ -12,7 +12,7 @@ import org.example.dao.entities.product.Item;
 import org.example.dao.entities.product.Product;
 import org.example.dao.entities.product.RuleType;
 import org.example.dao.repository.IProductRepository;
-import org.example.service.api.ICategoryClient;
+import org.example.service.api.client.ICategoryClient;
 import org.example.service.api.IProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -95,9 +96,7 @@ public class ProductService implements IProductService {
     @Override
     public ProductDTO addItem(UUID productUuid, ItemDTO itemDTO) {
         Product product = getProductOrThrow(productUuid);
-        Optional<Item> sameItemForExpiresAt = product.getItems().stream()
-                .filter(persistedItem -> Objects.equals(persistedItem.getExpiresAt(), itemDTO.getExpiresAt()))
-                .findAny();
+        Optional<Item> sameItemForExpiresAt = findItemFromProductWhichExpiresAt(product, itemDTO.getExpiresAt());
 
         sameItemForExpiresAt.ifPresentOrElse(
                 persistedItem -> persistedItem.setQuantity(persistedItem.getQuantity() + itemDTO.getQuantity()),
@@ -109,9 +108,7 @@ public class ProductService implements IProductService {
     @Override
     public ProductDTO addToItemQuantity(UUID productUuid, LocalDate expiresAt, Integer summand) {
         Product product = getProductOrThrow(productUuid);
-        Item item = product.getItems().stream()
-                .filter(i -> Objects.equals(i.getExpiresAt(), expiresAt))
-                .findAny()
+        Item item = findItemFromProductWhichExpiresAt(product, expiresAt)
                 .orElseThrow(() -> new InternalException("no item found for this expiration date"));
 
         int totalAmount = item.getQuantity() + summand;
@@ -126,9 +123,7 @@ public class ProductService implements IProductService {
     @Override
     public ProductDTO changeItemExpirationDate(UUID productUuid, LocalDate expiresAt, LocalDate replacement) {
         Product product = getProductOrThrow(productUuid);
-        Item item = product.getItems().stream()
-                .filter(i -> Objects.equals(i.getExpiresAt(), expiresAt))
-                .findAny()
+        Item item = findItemFromProductWhichExpiresAt(product, expiresAt)
                 .orElseThrow(() -> new InternalException("no item found for this expiration date"));
         item.setExpiresAt(replacement);
         mergeItemsWithSameExpirationDate(product.getItems(), item);
@@ -145,8 +140,7 @@ public class ProductService implements IProductService {
 
     private void mergeItemsWithSameExpirationDate(List<Item> items, Item probeItem) {
         if (null != items) {
-            items.stream().filter(listItem -> listItem != probeItem && Objects.equals(listItem.getExpiresAt(), probeItem.getExpiresAt()))
-                    .findAny()
+            findAnyItemByFilter(items, item -> item != probeItem && Objects.equals(item.getExpiresAt(), probeItem.getExpiresAt()))
                     .ifPresent(duplicateItem -> {
                         probeItem.setQuantity(probeItem.getQuantity() + duplicateItem.getQuantity());
                         items.remove(duplicateItem);
@@ -189,5 +183,17 @@ public class ProductService implements IProductService {
                 .filter(rule -> ruleTypesLeft.contains(rule.getRuleType()))
                 .peek(rule -> ruleTypesLeft.remove(rule.getRuleType()))
                 .collect(Collectors.toSet());
+    }
+
+    private static Optional<Item> findItemFromProductWhichExpiresAt(Product product, LocalDate expiresAt) {
+        return product.getItems().stream()
+                .filter(i -> Objects.equals(i.getExpiresAt(), expiresAt))
+                .findAny();
+    }
+
+    private static Optional<Item> findAnyItemByFilter(Collection<Item> items, Predicate<Item> filterPredicate) {
+        return items.stream()
+                .filter(filterPredicate)
+                .findAny();
     }
 }
