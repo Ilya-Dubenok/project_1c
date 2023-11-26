@@ -12,6 +12,9 @@ import org.example.core.dto.report.ProductToBuyDTO;
 import org.example.core.dto.report.ReportDTO;
 import org.example.service.api.IReportFileFormerService;
 import org.example.service.api.IReportService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -69,5 +72,26 @@ public class ReportController {
     public ResponseEntity<byte[]> getXLSXReportFile(@PathVariable UUID uuid) {
         byte[] reportFileByteArray = reportFileFormerService.formXLSXReport(uuid);
         return ResponseEntity.status(HttpStatus.OK).header("Content-Disposition", "attachment; filename=report.xlsx").body(reportFileByteArray);
+    }
+
+    @Operation(summary = "Get page of reports")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Page returned"),
+            @ApiResponse(responseCode = "400", description = "Invalid params passed",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InternalExceptionDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Products not found",
+                    content = @Content)})
+    @GetMapping
+    public Page<ReportDTO> getPage(@PageableDefault(size = 20, sort = {"formedOn"}) Pageable pageable) {
+        return reportService.getPage(pageable);
+    }
+
+    @Operation(summary = "Delete all stored reports")
+    @ApiResponses(value = @ApiResponse(responseCode = "204", description = "All reports deleted"))
+    @DeleteMapping(value = "/all")
+    public ResponseEntity<?> deleteAllReports() {
+        reportService.deleteAllReports();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
