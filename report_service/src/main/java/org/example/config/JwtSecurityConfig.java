@@ -2,6 +2,7 @@ package org.example.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,7 +18,7 @@ public class JwtSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(authorization ->
                 authorization
-                        .requestMatchers("report/full")
+                        .requestMatchers(HttpMethod.DELETE,"report/all")
                         .hasAnyAuthority("SCOPE_perform_all_operations")
                         .requestMatchers("report-service/v3/api-docs")
                         .permitAll()
