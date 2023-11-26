@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.core.dto.exception.dto.InternalExceptionDTO;
@@ -87,7 +88,7 @@ public class ReportController {
         return reportService.getPage(pageable);
     }
 
-    @Operation(summary = "Delete all stored reports")
+    @Operation(summary = "Delete all stored reports", security = @SecurityRequirement(name = "oauthScheme", scopes = {"perform_all_operations"}))
     @ApiResponses(value = @ApiResponse(responseCode = "204", description = "All reports deleted"))
     @DeleteMapping(value = "/all")
     public ResponseEntity<?> deleteAllReports() {
