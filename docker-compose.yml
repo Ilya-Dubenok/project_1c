@@ -71,6 +71,39 @@ services:
     environment:
       EUREKA_URI: ${EUREKA_URI}
 
+  keycloak:
+    image: jboss/keycloak
+    restart: on-failure
+    networks:
+      - services_ntwrk
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=postgres
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_ADDR=keycloak-db
+      - DB_PORT=5432
+      - DB_DATABASE=keycloakdb
+      - KEYCLOAK_IMPORT=/tmp/project_1c_realm.json
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./keycloak/project_1c_realm.json:/tmp/project_1c_realm.json
+    depends_on:
+      - keycloak-db
+
+  keycloak-db:
+    image: postgres
+    networks:
+      - services_ntwrk
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: keycloakdb
+    volumes:
+      - keycloak_db_vlm:/var/lib/postgresql/data
+
   category_service:
     build: category_service
     depends_on:
@@ -112,6 +145,9 @@ services:
     networks:
       - services_ntwrk
 
+volumes:
+  keycloak_db_vlm:
+    name: keycloak_db_vlm
 
 networks:
   services_ntwrk:
