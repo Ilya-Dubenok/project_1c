@@ -14,6 +14,13 @@ spring:
       circuitbreaker:
         enabled: true
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8180/auth/realms/project_1c/protocol/openid-connect/certs
+
+
 resilience4j:
   timelimiter:
     configs:
@@ -38,3 +45,7 @@ logging:
       - org.springframework.data.mongodb.core.MongoTemplate
   level:
     mongo: DEBUG
+
+paths:
+  jwt:
+    token-url: http://localhost:8180/auth/realms/project_1c/protocol/openid-connect/token
