@@ -115,6 +115,7 @@ services:
       spring.datasource.url: jdbc:postgresql://postgres_db:5432/category_service?ApplicationName=Category_Service
       spring.datasource.username: root
       spring.datasource.password: root
+      spring.cloud.config.label: product_service
       spring.cloud.config.retry.max-attempts: 20
       spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://keycloak:8080/auth/realms/project_1c/protocol/openid-connect/certs
       paths.jwt.token-url: ${KEYCLOAK_TOKEN_URL}
