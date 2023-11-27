@@ -18,6 +18,12 @@ spring:
     hikari:
       schema: app
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8180/auth/realms/project_1c/protocol/openid-connect/certs
+
   jackson:
     property-naming-strategy: SNAKE_CASE
 
@@ -47,3 +53,6 @@ server:
       charset: UTF-8
       force: true
 
+paths:
+  jwt:
+    token-url: http://localhost:8180/auth/realms/project_1c/protocol/openid-connect/token
