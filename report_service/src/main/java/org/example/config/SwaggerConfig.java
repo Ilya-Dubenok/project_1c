@@ -19,6 +19,9 @@ import java.util.List;
 @OpenAPIDefinition
 public class SwaggerConfig {
 
+    @Value("${paths.jwt.token-url}")
+    private String tokenUrl;
+
     @Bean
     public ModelResolver modelResolver(ObjectMapper objectMapper) {
         return new ModelResolver(objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE));
@@ -39,19 +42,19 @@ public class SwaggerConfig {
     }
 
     private SecurityScheme createOAuthScheme() {
-        OAuthFlows flows = createOAuthFlows();
+        OAuthFlows flows = createPasswordOauthFlow();
         return new SecurityScheme().type(SecurityScheme.Type.OAUTH2)
                 .flows(flows);
     }
 
-    private OAuthFlows createOAuthFlows() {
-        OAuthFlow flow = createAuthorizationCodeFlow();
+    private OAuthFlows createPasswordOauthFlow() {
+        OAuthFlow flow = createTokenUrlOAuthFlow();
         return new OAuthFlows().password(flow);
     }
 
-    private OAuthFlow createAuthorizationCodeFlow() {
+    private OAuthFlow createTokenUrlOAuthFlow() {
         return new OAuthFlow()
-                .tokenUrl("http://localhost:8180/auth/realms/project_1c/protocol/openid-connect/token")
+                .tokenUrl(tokenUrl)
                 .scopes(new Scopes().addString("perform_all_operations", "full_access_scope"));
     }
 }
