@@ -19,6 +19,8 @@ public class JwtSecurityConfig {
                 authorization
                         .requestMatchers("category-service/v3/api-docs")
                         .permitAll()
+                        .requestMatchers("internal/**")
+                        .permitAll()
                         .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
