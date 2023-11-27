@@ -128,9 +128,12 @@ services:
       - mongo_db
       - gateway
       - config_server
+      - keycloak
     environment:
       spring.data.mongodb.uri: mongodb://${MONGO_ADMIN_USERNAME}:${MONGO_ADMIN_PASSWORD}@mongo_db:27017/project1c_db?authSource=admin
       spring.cloud.config.retry.max-attempts: 20
+      spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://keycloak:8080/auth/realms/project_1c/protocol/openid-connect/certs
+      paths.jwt.token-url: ${KEYCLOAK_TOKEN_URL}
       EUREKA_URI: ${EUREKA_URI}
     networks:
       - services_ntwrk
