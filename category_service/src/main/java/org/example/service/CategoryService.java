@@ -60,11 +60,7 @@ public class CategoryService implements ICategoryService {
         List<CategoryDTO> parentsList = new ArrayList<>();
         Category category = categoryRepository.findById(categoryUuid).orElseThrow(() -> new EntityNotFoundException("category"));
         parentsList.add(mapper.map(category, CategoryDTO.class));
-        Category parent = category.getParent();
-        while (null != parent){
-            parentsList.add(mapper.map(parent, CategoryDTO.class));
-            parent = parent.getParent();
-        }
+        parentsList.addAll(getAllParentsForCategoryAsDTOs(category));
         return parentsList;
     }
 
@@ -101,6 +97,16 @@ public class CategoryService implements ICategoryService {
     @Override
     public Boolean existsByUuid(UUID uuid) {
         return categoryRepository.existsById(uuid);
+    }
+
+    private List<CategoryDTO> getAllParentsForCategoryAsDTOs(Category category) {
+        Category parent = category.getParent();
+        List<CategoryDTO> parentsList = new ArrayList<>();
+        while (null != parent){
+            parentsList.add(mapper.map(parent, CategoryDTO.class));
+            parent = parent.getParent();
+        }
+        return parentsList;
     }
 
     private String getValidatedCategoryName(CategoryCreateDTO categoryCreateDTO) {
