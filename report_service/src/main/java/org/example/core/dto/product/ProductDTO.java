@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ProductDTO {
 
-    private UUID uuid;
+    private UUID id;
 
     private UUID categoryId;
 

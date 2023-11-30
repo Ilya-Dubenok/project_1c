@@ -14,12 +14,12 @@ import java.util.UUID;
 @FeignClient(name = "category-service", path = "/internal", fallbackFactory = CategoryClientFallBackFactory.class)
 public interface ICategoryClient {
 
-    @RequestMapping(method = RequestMethod.GET, path = "/exists/{uuid}")
-    Boolean categoryExists(@PathVariable(name = "uuid") UUID categoryUuid);
+    @RequestMapping(method = RequestMethod.GET, path = "/exists/{id}")
+    Boolean categoryExists(@PathVariable(name = "id") UUID categoryId);
 
-    @RequestMapping(value = "/applicable_rules/{uuid}")
-    List<RuleDTO> getRulesApplicableFromCategories(@PathVariable(name = "uuid") UUID categoryUuid, @RequestParam(name = "rules") Set<RuleType> ruleTypeSet);
+    @RequestMapping(value = "/applicable_rules/{id}")
+    List<RuleDTO> getRulesApplicableFromCategories(@PathVariable(name = "id") UUID categoryId, @RequestParam(name = "rules") Set<RuleType> ruleTypeSet);
 
-    @GetMapping(value = "/category_and_parents/{uuid}")
-    List<CategoryDTO> getCategoryAndParents(@PathVariable(name = "uuid") UUID categoryUuid);
+    @GetMapping(value = "/category_and_parents/{id}")
+    List<CategoryDTO> getCategoryAndParents(@PathVariable(name = "id") UUID categoryId);
 }

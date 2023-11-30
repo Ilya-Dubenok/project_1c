@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ReportDTO {
 
-    private UUID uuid;
+    private UUID id;
 
     private LocalDateTime formedOn;
 

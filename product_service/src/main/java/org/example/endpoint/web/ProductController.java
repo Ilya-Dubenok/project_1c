@@ -61,9 +61,9 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @GetMapping("/{uuid}")
-    public ProductDTO getById(@PathVariable UUID uuid) {
-        return productService.findByUUID(uuid);
+    @GetMapping("/{id}")
+    public ProductDTO getById(@PathVariable UUID id) {
+        return productService.findById(id);
     }
 
     @Operation(summary = "Get product by name")
@@ -102,9 +102,9 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PutMapping("/{uuid}/name/{name}")
-    public ProductDTO updateName(@PathVariable UUID uuid, @PathVariable String name) {
-        return productService.updateName(uuid, name);
+    @PutMapping("/{id}/name/{name}")
+    public ProductDTO updateName(@PathVariable UUID id, @PathVariable String name) {
+        return productService.updateName(id, name);
     }
 
     @Operation(summary = "Update rules of the product")
@@ -115,9 +115,9 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PutMapping("/{uuid}/rules")
-    public ProductDTO updateRules(@PathVariable(name = "uuid") UUID uuid, @Valid @RequestBody List<RuleDTO> ruleDTOList) {
-        return productService.updateRules(uuid, ruleDTOList);
+    @PutMapping("/{id}/rules")
+    public ProductDTO updateRules(@PathVariable(name = "id") UUID id, @Valid @RequestBody List<RuleDTO> ruleDTOList) {
+        return productService.updateRules(id, ruleDTOList);
     }
 
     @Operation(summary = "Update items of the product")
@@ -128,9 +128,9 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PutMapping("/{uuid}/items")
-    public ProductDTO updateItems(@PathVariable UUID uuid, @Valid @RequestBody List<ItemDTO> itemDTOList) {
-        return productService.updateItems(uuid, itemDTOList);
+    @PutMapping("/{id}/items")
+    public ProductDTO updateItems(@PathVariable UUID id, @Valid @RequestBody List<ItemDTO> itemDTOList) {
+        return productService.updateItems(id, itemDTOList);
     }
 
     @Operation(summary = "Add new item to the product")
@@ -141,9 +141,9 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PostMapping("/{uuid}/items/add")
-    public ProductDTO addItem(@PathVariable UUID uuid, @Valid @RequestBody ItemDTO itemDTO) {
-        return productService.addItem(uuid, itemDTO);
+    @PostMapping("/{id}/items/add")
+    public ProductDTO addItem(@PathVariable UUID id, @Valid @RequestBody ItemDTO itemDTO) {
+        return productService.addItem(id, itemDTO);
     }
 
     @Operation(summary = "Increase or decrease quantity of the stored item")
@@ -154,11 +154,11 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PutMapping("/{uuid}/items/add")
-    public ProductDTO addToItemQuantity(@PathVariable UUID uuid,
+    @PutMapping("/{id}/items/add")
+    public ProductDTO addToItemQuantity(@PathVariable UUID id,
                                         @RequestParam(name = "expires_at", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate expiresAt,
                                         @RequestParam(name = "summand") Integer summand) {
-        return productService.addToItemQuantity(uuid, expiresAt, summand);
+        return productService.addToItemQuantity(id, expiresAt, summand);
     }
 
     @Operation(summary = "Change expiration date of the stored item of the product")
@@ -169,11 +169,11 @@ public class ProductController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = @Content)})
-    @PutMapping("/{uuid}/items/expiration")
-    public ProductDTO changeItemExpirationDate(@PathVariable UUID uuid,
+    @PutMapping("/{id}/items/expiration")
+    public ProductDTO changeItemExpirationDate(@PathVariable UUID id,
                                                @RequestParam(name = "expires_at", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate expiresAt,
                                                @RequestParam(name = "new_date", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate replacement) {
-        return productService.changeItemExpirationDate(uuid, expiresAt, replacement);
+        return productService.changeItemExpirationDate(id, expiresAt, replacement);
     }
 
     @Operation(summary = "delete product")
@@ -183,9 +183,9 @@ public class ProductController {
                     @Schema(description = "errors messages",
                             oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
             )})
-    @DeleteMapping(value = "/{uuid}")
-    public ResponseEntity<?> delete(@PathVariable UUID uuid) {
-        productService.delete(uuid);
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
+        productService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

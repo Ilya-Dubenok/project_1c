@@ -17,15 +17,15 @@ public class ExpirationRule implements IRule {
 
     @Id
     @Column(name= "id")
-    private UUID uuid;
+    private UUID id;
 
     private Integer daysTillExpiration;
 
     @Enumerated(EnumType.ORDINAL)
     private RuleType ruleType = RuleType.EXP;
 
-    public ExpirationRule(UUID uuid, Integer daysTillExpiration) {
-        this.uuid = uuid;
+    public ExpirationRule(UUID id, Integer daysTillExpiration) {
+        this.id = id;
         this.daysTillExpiration = daysTillExpiration;
     }
 

@@ -7,14 +7,12 @@ import org.example.core.dto.rule.QuantityRuleDTO;
 import org.example.dao.entities.ProductData;
 import org.example.dao.entities.ReportData;
 import org.example.service.transitional.*;
-import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -49,7 +47,7 @@ public class ModelMapperConfig {
                 .addMappings(new PropertyMap<>() {
                     @Override
                     protected void configure() {
-                        map().setUuid(source.getProductDTO().getUuid());
+                        map().setId(source.getProductDTO().getId());
                         map().setName(source.getProductDTO().getName());
                     }
                 });
@@ -66,7 +64,7 @@ public class ModelMapperConfig {
 
     private Converter<List<ProductToBuy>, List<ProductData>> fromListOfProductToBuyToListOfProductDataConverter() {
        return context -> context.getSource().stream()
-               .map(productToBuy -> new ProductData(productToBuy.getProductDTO().getUuid(), productToBuy.getProductDTO().getName(), productToBuy.getQuantity())).toList();
+               .map(productToBuy -> new ProductData(productToBuy.getProductDTO().getId(), productToBuy.getProductDTO().getName(), productToBuy.getQuantity())).toList();
     }
 
     private Converter<Set<Node>,List<ReportData>> fromSetOfNodesToListOfReportDataConverter() {

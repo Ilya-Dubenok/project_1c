@@ -37,8 +37,8 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public CategoryDTO findByUUID(UUID uuid) {
-        Category category = categoryRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("category"));
+    public CategoryDTO findById(UUID id) {
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("category"));
         return mapper.map(category, CategoryDTO.class);
     }
 
@@ -49,16 +49,16 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public List<CategoryDTO> findChildrenByParentId(UUID parentUUID) {
-        return categoryRepository.findByParent_UuidEquals(parentUUID).stream()
+    public List<CategoryDTO> findChildrenByParentId(UUID parentId) {
+        return categoryRepository.findByParent_IdEquals(parentId).stream()
                 .map(x -> mapper.map(x, CategoryDTO.class))
                 .toList();
     }
 
     @Override
-    public List<CategoryDTO> findCategoryAndParents(UUID categoryUuid) {
+    public List<CategoryDTO> findCategoryAndParents(UUID categoryId) {
         List<CategoryDTO> parentsList = new ArrayList<>();
-        Category category = categoryRepository.findById(categoryUuid).orElseThrow(() -> new EntityNotFoundException("category"));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new EntityNotFoundException("category"));
         parentsList.add(mapper.map(category, CategoryDTO.class));
         parentsList.addAll(getAllParentsForCategoryAsDTOs(category));
         return parentsList;
@@ -76,9 +76,9 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public CategoryDTO updateNameAndRules(UUID uuid, CategoryUpdateDTO categoryUpdateDTO) {
+    public CategoryDTO updateNameAndRules(UUID id, CategoryUpdateDTO categoryUpdateDTO) {
 
-        Category categoryToUpdate = categoryRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("category"));
+        Category categoryToUpdate = categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("category"));
         categoryToUpdate.setName(categoryUpdateDTO.getName());
         List<IRule> rules = createRuleList(categoryUpdateDTO.getRules());
         categoryToUpdate.setRules(rules);
@@ -87,16 +87,16 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public void delete(UUID uuid) {
-        if (!categoryRepository.existsById(uuid)) {
+    public void delete(UUID id) {
+        if (!categoryRepository.existsById(id)) {
             throw new EntityNotFoundException();
         }
-        categoryRepository.deleteById(uuid);
+        categoryRepository.deleteById(id);
     }
 
     @Override
-    public Boolean existsByUuid(UUID uuid) {
-        return categoryRepository.existsById(uuid);
+    public Boolean existsById(UUID id) {
+        return categoryRepository.existsById(id);
     }
 
     private List<CategoryDTO> getAllParentsForCategoryAsDTOs(Category category) {
@@ -118,11 +118,11 @@ public class CategoryService implements ICategoryService {
     }
 
     private Category getValidatedCategoryParent(CategoryCreateDTO categoryCreateDTO) {
-        UUID parentUuid = categoryCreateDTO.getParentUuid();
+        UUID parentId = categoryCreateDTO.getParentId();
         Category parent = null;
-        if (null != parentUuid) {
-            parent = categoryRepository.findById(parentUuid).orElseThrow(
-                    () -> new InternalException("No category for this parent uuid found")
+        if (null != parentId) {
+            parent = categoryRepository.findById(parentId).orElseThrow(
+                    () -> new InternalException("No category for this parent id found")
             );
         }
         return parent;

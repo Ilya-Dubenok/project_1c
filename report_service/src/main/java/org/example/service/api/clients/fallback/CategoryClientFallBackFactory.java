@@ -22,17 +22,17 @@ public class CategoryClientFallBackFactory implements FallbackFactory<ICategoryC
         log.error("[FALLBACK] Could not reach category-service", cause);
         return new ICategoryClient() {
             @Override
-            public Boolean categoryExists(UUID categoryUuid) {
+            public Boolean categoryExists(UUID categoryId) {
                 throw new OtherServiceUnavailableException();
             }
 
             @Override
-            public List<RuleDTO> getRulesApplicableFromCategories(UUID categoryUuid, Set<RuleType> ruleTypeSet) {
+            public List<RuleDTO> getRulesApplicableFromCategories(UUID categoryId, Set<RuleType> ruleTypeSet) {
                 throw new OtherServiceUnavailableException();
             }
 
             @Override
-            public List<CategoryDTO> getCategoryAndParents(UUID categoryUuid) {
+            public List<CategoryDTO> getCategoryAndParents(UUID categoryId) {
                 throw new OtherServiceUnavailableException();
             }
         };

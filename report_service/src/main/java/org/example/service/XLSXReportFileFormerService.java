@@ -98,9 +98,9 @@ public class XLSXReportFileFormerService implements IXLSXReportFileFormerService
     private void addMetaInfoToReport(Sheet sheet, ReportDTO reportDTO, int rightOffset) {
         int metaInfoStartColumn = sheet.getActiveCell().getColumn() + rightOffset;
 
-        Row uuidRow = sheet.getRow(0);
-        createCellAndSetStringValue(uuidRow, metaInfoStartColumn, "UUID: ");
-        createCellAndSetStringValue(uuidRow, metaInfoStartColumn + 1, reportDTO.getUuid().toString());
+        Row idRow = sheet.getRow(0);
+        createCellAndSetStringValue(idRow, metaInfoStartColumn, "ID: ");
+        createCellAndSetStringValue(idRow, metaInfoStartColumn + 1, reportDTO.getId().toString());
         Row formedOnRow = sheet.getRow(1);
         createCellAndSetStringValue(formedOnRow, metaInfoStartColumn, "Formed on: ");
         createCellAndSetStringValue(formedOnRow, metaInfoStartColumn + 1, reportDTO.getFormedOn().toString());

@@ -18,8 +18,8 @@ public class ReportFileFormerService implements IReportFileFormerService {
     private final IXLSXReportFileFormerService xlsxReportFileFormerService;
 
     @Override
-    public byte[] formXLSXReport(UUID uuid) {
-        ReportDTO reportDTO = reportService.gerReport(uuid);
+    public byte[] formXLSXReport(UUID id) {
+        ReportDTO reportDTO = reportService.gerReport(id);
         return xlsxReportFileFormerService.getXLSXReportFile(reportDTO);
     }
 }

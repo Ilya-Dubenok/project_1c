@@ -50,8 +50,8 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public ReportDTO gerReport(UUID uuid) {
-        Report report = reportRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("report"));
+    public ReportDTO gerReport(UUID id) {
+        Report report = reportRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("report"));
         return mapper.map(report, ReportDTO.class);
     }
 
@@ -109,8 +109,8 @@ public class ReportService implements IReportService {
     }
 
     private void setCategories(ProductToBuy productToBuy) {
-        UUID categoryUuid = productToBuy.getProductDTO().getCategoryId();
-        List<CategoryDTO> categoryList = categoryClient.getCategoryAndParents(categoryUuid);
+        UUID categoryId = productToBuy.getProductDTO().getCategoryId();
+        List<CategoryDTO> categoryList = categoryClient.getCategoryAndParents(categoryId);
         productToBuy.setCategories(categoryList);
     }
 

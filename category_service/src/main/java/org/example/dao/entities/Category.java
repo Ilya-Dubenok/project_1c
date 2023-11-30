@@ -23,7 +23,7 @@ public class Category {
 
     @Id
     @Column(name = "id")
-    private UUID uuid;
+    private UUID id;
 
     @Column(nullable = false)
     private String name;
@@ -51,8 +51,8 @@ public class Category {
         this.name = name;
     }
 
-    public Category(UUID uuid, String name) {
-        this.uuid = uuid;
+    public Category(UUID id, String name) {
+        this.id = id;
         this.name = name;
     }
 }
