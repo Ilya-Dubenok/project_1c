@@ -12,5 +12,5 @@ public interface IReportService {
 
     ReportDTO formReport();
 
-    ReportDTO gerReport(UUID id);
+    ReportDTO getReport(UUID id);
 }

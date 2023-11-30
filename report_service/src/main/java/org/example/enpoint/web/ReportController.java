@@ -55,7 +55,7 @@ public class ReportController {
     })
     @GetMapping("/full/{id}")
     public ReportDTO getFullReport(@PathVariable UUID id) {
-        return reportService.gerReport(id);
+        return reportService.getReport(id);
     }
 
     @Operation(summary = "Get full report formed in xlsx format by id")

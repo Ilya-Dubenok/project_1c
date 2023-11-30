@@ -50,7 +50,7 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public ReportDTO gerReport(UUID id) {
+    public ReportDTO getReport(UUID id) {
         Report report = reportRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("report"));
         return mapper.map(report, ReportDTO.class);
     }
