@@ -71,14 +71,14 @@ public class ReportService implements IReportService {
         nodeChainList.add(new NodeChain(listOfProductsToBuy.remove(0)));
         while (listOfProductsToBuy.size() > 0) {
             ProductToBuy productToBuy = listOfProductsToBuy.remove(0);
-            if (!productToBuyIsMergedIntoNodeChain(nodeChainList, productToBuy)) {
+            if (!isProductToBuyMergedIntoNodeChain(nodeChainList, productToBuy)) {
                 nodeChainList.add(new NodeChain(productToBuy));
             }
         }
         return nodeChainList;
     }
 
-    private boolean productToBuyIsMergedIntoNodeChain(List<NodeChain> nodeChainList, ProductToBuy productToBuy) {
+    private boolean isProductToBuyMergedIntoNodeChain(List<NodeChain> nodeChainList, ProductToBuy productToBuy) {
         return nodeChainList.stream().anyMatch(nodeChain -> nodeChain.isProductToBuyMergedIntoChain(productToBuy));
     }
 
