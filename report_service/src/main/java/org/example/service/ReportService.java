@@ -84,7 +84,7 @@ public class ReportService implements IReportService {
 
     private List<ProductToBuy> getListOfProductsToBuy() {
         return productClient.getProductsList().stream()
-                .map(this::formProductToBuyWithGreaterThanZeroQuantity)
+                .map(this::formProductToBuyWithValidQuantity)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
@@ -97,7 +97,7 @@ public class ReportService implements IReportService {
         return productToBuy;
     }
 
-    private Optional<ProductToBuy> formProductToBuyWithGreaterThanZeroQuantity(ProductDTO productDTO) {
+    private Optional<ProductToBuy> formProductToBuyWithValidQuantity(ProductDTO productDTO) {
         ProductToBuy productToBuy = new ProductToBuy(productDTO);
         defineQuantityToBuy(productToBuy);
         if (productToBuy.getQuantity() > 0) {
