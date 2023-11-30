@@ -17,7 +17,7 @@ import java.util.UUID;
 public class Report {
 
     @Id
-    private UUID uuid;
+    private UUID id;
 
     private LocalDateTime formedOn;
 

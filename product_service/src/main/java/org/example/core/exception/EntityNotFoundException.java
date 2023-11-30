@@ -2,7 +2,7 @@ package org.example.core.exception;
 
 public class EntityNotFoundException extends RuntimeException {
 
-    private static final String MESSAGE_FORMAT = "No %s found for this uuid";
+    private static final String MESSAGE_FORMAT = "No %s found for this id";
 
     public EntityNotFoundException() {
         super("No product was found");

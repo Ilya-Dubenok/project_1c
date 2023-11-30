@@ -50,29 +50,28 @@ public class ReportController {
         return reportService.formReport();
     }
 
-    @Operation(summary = "Get full report by uuid")
+    @Operation(summary = "Get full report by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ReportDTO returned"),
-            @ApiResponse(responseCode = "404", description = "No report found for this uuid", content = {
+            @ApiResponse(responseCode = "404", description = "No report found for this id", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = InternalExceptionDTO.class))
             })
     })
-    @GetMapping("/full/{uuid}")
-    public ReportDTO getFullReport(@PathVariable UUID uuid) {
-        return reportService.gerReport(uuid);
+    @GetMapping("/full/{id}")
+    public ReportDTO getFullReport(@PathVariable UUID id) {
+        return reportService.getReport(id);
     }
 
-    @Operation(summary = "Get full report formed in xlsx format by uuid")
+    @Operation(summary = "Get full report formed in xlsx format by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ReportDTO returned"),
-            @ApiResponse(responseCode = "404", description = "No report found for this uuid", content = {
+            @ApiResponse(responseCode = "404", description = "No report found for this id", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = InternalExceptionDTO.class))
             })
     })
-    @GetMapping(value = "/xlsx/{uuid}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<byte[]> getXLSXReportFile(@PathVariable UUID uuid) {
-        byte[] reportFileByteArray = reportFileFormerService.formXLSXReport(uuid);
-        return ResponseEntity.status(HttpStatus.OK).header("Content-Disposition", "attachment; filename=report.xlsx").body(reportFileByteArray);
+    @GetMapping(value = "/xlsx/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> getXLSXReportFile(@PathVariable UUID id) {
+        return ResponseEntity.status(HttpStatus.OK).header("Content-Disposition", "attachment; filename=report.xlsx").body(reportFileFormerService.formXLSXReport(id));
     }
 
     @Operation(summary = "Get page of reports")

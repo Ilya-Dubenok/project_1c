@@ -13,11 +13,11 @@ import java.util.UUID;
 @NoArgsConstructor
 public class CategoryDTO {
 
-    private UUID uuid;
+    private UUID id;
 
     private String name;
 
-    private UUID parentUuid;
+    private UUID parentId;
 
     private List<RuleCreateDTO> rules;
 

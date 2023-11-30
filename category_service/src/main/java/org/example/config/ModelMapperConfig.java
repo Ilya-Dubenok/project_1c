@@ -21,7 +21,7 @@ public class ModelMapperConfig {
         modelMapper
                 .createTypeMap(Category.class, UUID.class)
                 .setCondition(context -> null != context.getSource())
-                .setConverter(context -> context.getSource().getUuid());
+                .setConverter(context -> context.getSource().getId());
 
         modelMapper
                 .createTypeMap(QuantityRule.class, RuleCreateDTO.class)
@@ -36,7 +36,7 @@ public class ModelMapperConfig {
                 .setProvider(context -> {
                     ExpirationRuleCreateDTO source = (ExpirationRuleCreateDTO) context.getSource();
                     ExpirationRule expirationRule = new ExpirationRule();
-                    expirationRule.setUuid(UUID.randomUUID());
+                    expirationRule.setId(UUID.randomUUID());
                     expirationRule.setDaysTillExpiration(source.getDaysTillExpiration());
                     return expirationRule;
                 });
@@ -46,7 +46,7 @@ public class ModelMapperConfig {
                 .setProvider(context -> {
                     QuantityRuleCreateDTO source = (QuantityRuleCreateDTO) context.getSource();
                     QuantityRule quantityRule = new QuantityRule();
-                    quantityRule.setUuid(UUID.randomUUID());
+                    quantityRule.setId(UUID.randomUUID());
                     quantityRule.setMinimumQuantity(source.getMinimumQuantity());
                     return quantityRule;
                 });

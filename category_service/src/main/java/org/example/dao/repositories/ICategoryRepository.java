@@ -10,6 +10,6 @@ public interface ICategoryRepository extends JpaRepository<Category, UUID> {
 
     Category findByName(String name);
 
-    List<Category> findByParent_UuidEquals(UUID uuid);
+    List<Category> findByParent_IdEquals(UUID parentId);
 
 }

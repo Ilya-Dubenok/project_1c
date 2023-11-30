@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public interface IReportFileFormerService {
 
-    byte[] formXLSXReport(UUID uuid);
+    byte[] formXLSXReport(UUID id);
 
 }

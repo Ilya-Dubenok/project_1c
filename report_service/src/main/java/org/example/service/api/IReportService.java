@@ -14,7 +14,7 @@ public interface IReportService {
 
     ReportDTO formReport();
 
-    ReportDTO gerReport(UUID uuid);
+    ReportDTO getReport(UUID id);
 
     Page<ReportDTO> getPage(Pageable pageable);
 

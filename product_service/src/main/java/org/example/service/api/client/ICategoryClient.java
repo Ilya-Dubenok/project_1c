@@ -11,7 +11,7 @@ import java.util.UUID;
 @FeignClient(name = "category-service", path = "/internal", fallbackFactory = CategoryClientFallbackFactory.class)
 public interface ICategoryClient {
 
-    @RequestMapping(method = RequestMethod.GET, path = "/exists/{uuid}")
-    Boolean categoryExists(@PathVariable(name = "uuid") UUID categoryUuid);
+    @RequestMapping(method = RequestMethod.GET, path = "/exists/{id}")
+    Boolean categoryExists(@PathVariable(name = "id") UUID categoryId);
 
 }

@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ProductData {
 
-    private UUID uuid;
+    private UUID id;
 
     private String name;
 

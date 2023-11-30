@@ -62,9 +62,9 @@ public class CategoryController {
                             schema = @Schema(implementation = InternalExceptionDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)})
-    @GetMapping("/{uuid}")
-    public CategoryDTO getById(@PathVariable UUID uuid) {
-        return categoryService.findByUUID(uuid);
+    @GetMapping("/{id}")
+    public CategoryDTO getById(@PathVariable UUID id) {
+        return categoryService.findById(id);
     }
 
     @Operation(summary = "Get page of categories")
@@ -87,9 +87,9 @@ public class CategoryController {
                     @Schema(description = "errors messages",
                             oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
             )})
-    @PutMapping(value = "/{uuid}")
-    public CategoryDTO update(@PathVariable UUID uuid, @Valid @RequestBody CategoryUpdateDTO categoryUpdateDTO) {
-        return categoryService.updateNameAndRules(uuid, categoryUpdateDTO);
+    @PutMapping(value = "/{id}")
+    public CategoryDTO update(@PathVariable UUID id, @Valid @RequestBody CategoryUpdateDTO categoryUpdateDTO) {
+        return categoryService.updateNameAndRules(id, categoryUpdateDTO);
     }
 
     @Operation(summary = "delete category")
@@ -99,9 +99,9 @@ public class CategoryController {
                     @Schema(description = "errors messages",
                             oneOf = {InternalExceptionDTO.class, StructuredExceptionDTO.class}))}
             )})
-    @DeleteMapping(value = "/{uuid}")
-    public ResponseEntity<?> delete(@PathVariable UUID uuid) {
-        categoryService.delete(uuid);
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
+        categoryService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

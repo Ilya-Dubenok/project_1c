@@ -14,11 +14,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CategoryDTO {
 
-    private UUID uuid;
+    private UUID id;
 
     private String name;
 
-    private UUID parentUuid;
+    private UUID parentId;
 
     private List<RuleDTO> rules;
 
@@ -27,11 +27,11 @@ public class CategoryDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CategoryDTO that = (CategoryDTO) o;
-        return Objects.equals(uuid, that.uuid);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid);
+        return Objects.hash(id);
     }
 }

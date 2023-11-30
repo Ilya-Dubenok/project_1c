@@ -7,7 +7,7 @@ import org.example.core.dto.rule.QuantityRuleDTO;
 import org.example.dao.entities.ProductData;
 import org.example.dao.entities.ReportData;
 import org.example.service.transitional.*;
-import org.modelmapper.AbstractConverter;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
@@ -47,30 +47,29 @@ public class ModelMapperConfig {
                 .addMappings(new PropertyMap<>() {
                     @Override
                     protected void configure() {
-                        map().setUuid(source.getProductDTO().getUuid());
+                        map().setId(source.getProductDTO().getId());
                         map().setName(source.getProductDTO().getName());
                     }
                 });
 
         modelMapper.createTypeMap(Node.class, ReportData.class)
-                .addMappings(mapper -> mapper.using(new AbstractConverter<List<ProductToBuy>, List<ProductData>>() {
-                    @Override
-                    protected List<ProductData> convert(List<ProductToBuy> source) {
-                        return source.stream()
-                                .map(productToBuy -> new ProductData(productToBuy.getProductDTO().getUuid(), productToBuy.getProductDTO().getName(), productToBuy.getQuantity())).toList();
-                    }
-                }).map(Node::getProducts, ReportData::setProducts))
-                .addMappings(mapping -> mapping.using(new AbstractConverter<Set<Node>, List<ReportData>>() {
-                    @Override
-                    protected List<ReportData> convert(Set<Node> source) {
-                        return source.stream().map(node -> modelMapper().map(node, ReportData.class)).toList();
-                    }
-                }).map(Node::getChildren, ReportData::setInnerDataList));
+                .addMappings(mapping -> mapping.using(fromListOfProductToBuyToListOfProductDataConverter()).map(Node::getProducts, ReportData::setProducts))
+                .addMappings(mapping -> mapping.using(fromSetOfNodesToListOfReportDataConverter()).map(Node::getChildren, ReportData::setInnerDataList));
 
         modelMapper.createTypeMap(ReportData.class, ReportDataDTO.class)
                 .addMapping(ReportData::getInnerDataList, ReportDataDTO::setSubcategories);
 
         return modelMapper;
+    }
+
+    private Converter<List<ProductToBuy>, List<ProductData>> fromListOfProductToBuyToListOfProductDataConverter() {
+       return context -> context.getSource().stream()
+               .map(productToBuy -> new ProductData(productToBuy.getProductDTO().getId(), productToBuy.getProductDTO().getName(), productToBuy.getQuantity())).toList();
+    }
+
+    private Converter<Set<Node>,List<ReportData>> fromSetOfNodesToListOfReportDataConverter() {
+        return context -> context.getSource().stream()
+                .map(node -> modelMapper().map(node, ReportData.class)).toList();
     }
 
 }

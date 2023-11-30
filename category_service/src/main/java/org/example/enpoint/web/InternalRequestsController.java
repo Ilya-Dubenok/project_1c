@@ -20,18 +20,18 @@ public class InternalRequestsController {
 
     private final ICategoryService categoryService;
 
-    @GetMapping(value = "/exists/{uuid}")
-    public Boolean categoryExists(@PathVariable UUID uuid) {
-        return categoryService.existsByUuid(uuid);
+    @GetMapping(value = "/exists/{id}")
+    public Boolean categoryExists(@PathVariable UUID id) {
+        return categoryService.existsById(id);
     }
 
-    @GetMapping(value = "/applicable_rules/{uuid}")
-    public List<RuleCreateDTO> getRulesStartingFromCategory(@PathVariable(name = "uuid") UUID categoryUuid, @RequestParam(name = "rules") Set<RuleType> ruleTypeSet) {
-        return categoryService.findApplicableRules(categoryUuid, ruleTypeSet);
+    @GetMapping(value = "/applicable_rules/{id}")
+    public List<RuleCreateDTO> getRulesStartingFromCategory(@PathVariable(name = "id") UUID categoryId, @RequestParam(name = "rules") Set<RuleType> ruleTypeSet) {
+        return categoryService.findApplicableRules(categoryId, ruleTypeSet);
     }
 
-    @GetMapping(value = "/category_and_parents/{uuid}")
-    public List<CategoryDTO> findCategoryAndParents(@PathVariable(name = "uuid") UUID categoryUuid){
-        return categoryService.findCategoryAndParents(categoryUuid);
+    @GetMapping(value = "/category_and_parents/{id}")
+    public List<CategoryDTO> findCategoryAndParents(@PathVariable(name = "id") UUID categoryId){
+        return categoryService.findCategoryAndParents(categoryId);
     }
 }

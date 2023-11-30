@@ -52,8 +52,8 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public ReportDTO gerReport(UUID uuid) {
-        Report report = reportRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("report"));
+    public ReportDTO getReport(UUID id) {
+        Report report = reportRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("report"));
         return mapper.map(report, ReportDTO.class);
     }
 
@@ -84,20 +84,20 @@ public class ReportService implements IReportService {
         nodeChainList.add(new NodeChain(listOfProductsToBuy.remove(0)));
         while (listOfProductsToBuy.size() > 0) {
             ProductToBuy productToBuy = listOfProductsToBuy.remove(0);
-            if (!productToBuyIsMergedIntoNodeChain(nodeChainList, productToBuy)) {
+            if (!isProductToBuyMergedIntoNodeChain(nodeChainList, productToBuy)) {
                 nodeChainList.add(new NodeChain(productToBuy));
             }
         }
         return nodeChainList;
     }
 
-    private boolean productToBuyIsMergedIntoNodeChain(List<NodeChain> nodeChainList, ProductToBuy productToBuy) {
+    private boolean isProductToBuyMergedIntoNodeChain(List<NodeChain> nodeChainList, ProductToBuy productToBuy) {
         return nodeChainList.stream().anyMatch(nodeChain -> nodeChain.isProductToBuyMergedIntoChain(productToBuy));
     }
 
     private List<ProductToBuy> getListOfProductsToBuy() {
         return productClient.getProductsList().stream()
-                .map(this::formProductToBuyWithGreaterThanZeroQuantity)
+                .map(this::formProductToBuyWithValidQuantity)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
@@ -110,7 +110,7 @@ public class ReportService implements IReportService {
         return productToBuy;
     }
 
-    private Optional<ProductToBuy> formProductToBuyWithGreaterThanZeroQuantity(ProductDTO productDTO) {
+    private Optional<ProductToBuy> formProductToBuyWithValidQuantity(ProductDTO productDTO) {
         ProductToBuy productToBuy = new ProductToBuy(productDTO);
         defineQuantityToBuy(productToBuy);
         if (productToBuy.getQuantity() > 0) {
@@ -122,8 +122,8 @@ public class ReportService implements IReportService {
     }
 
     private void setCategories(ProductToBuy productToBuy) {
-        UUID categoryUuid = productToBuy.getProductDTO().getCategoryId();
-        List<CategoryDTO> categoryList = categoryClient.getCategoryAndParents(categoryUuid);
+        UUID categoryId = productToBuy.getProductDTO().getCategoryId();
+        List<CategoryDTO> categoryList = categoryClient.getCategoryAndParents(categoryId);
         productToBuy.setCategories(categoryList);
     }
 

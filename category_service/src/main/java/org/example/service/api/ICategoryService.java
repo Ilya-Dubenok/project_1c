@@ -16,19 +16,19 @@ public interface ICategoryService {
 
     CategoryDTO save(CategoryCreateDTO categoryCreateDTO);
 
-    CategoryDTO findByUUID(UUID uuid);
+    CategoryDTO findById(UUID id);
 
-    List<CategoryDTO> findChildrenByParentId(UUID parentUUID);
+    List<CategoryDTO> findChildrenByParentId(UUID parentId);
 
-    List<CategoryDTO> findCategoryAndParents(UUID categoryUuid);
+    List<CategoryDTO> findCategoryAndParents(UUID categoryId);
 
     Page<CategoryDTO> getPage(Pageable pageable);
 
     List<RuleCreateDTO> findApplicableRules(UUID startCategoryId, Set<RuleType> ruleTypes);
 
-    CategoryDTO updateNameAndRules(UUID uuid, CategoryUpdateDTO categoryUpdateDTO);
+    CategoryDTO updateNameAndRules(UUID id, CategoryUpdateDTO categoryUpdateDTO);
 
-    void delete(UUID uuid);
+    void delete(UUID id);
 
-    Boolean existsByUuid(UUID uuid);
+    Boolean existsById(UUID id);
 }

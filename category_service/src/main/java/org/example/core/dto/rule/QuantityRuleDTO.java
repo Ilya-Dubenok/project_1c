@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class QuantityRuleDTO extends QuantityRuleCreateDTO{
 
-    private UUID uuid;
+    private UUID id;
 
     private RuleType ruleType = RuleType.QUANT;
 
