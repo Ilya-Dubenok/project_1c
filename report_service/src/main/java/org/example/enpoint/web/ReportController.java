@@ -67,7 +67,6 @@ public class ReportController {
     })
     @GetMapping(value = "/xlsx/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> getXLSXReportFile(@PathVariable UUID id) {
-        byte[] reportFileByteArray = reportFileFormerService.formXLSXReport(id);
-        return ResponseEntity.status(HttpStatus.OK).header("Content-Disposition", "attachment; filename=report.xlsx").body(reportFileByteArray);
+        return ResponseEntity.status(HttpStatus.OK).header("Content-Disposition", "attachment; filename=report.xlsx").body(reportFileFormerService.formXLSXReport(id));
     }
 }
