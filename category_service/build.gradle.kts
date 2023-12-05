@@ -30,6 +30,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
@@ -37,11 +40,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.google.guava:guava:11.0.2")
     implementation("org.modelmapper:modelmapper:3.2.0")
+    implementation("org.liquibase:liquibase-core:4.25.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    testImplementation("org.springframework.security:spring-security-test")
 }
 
 dependencyManagement {
@@ -56,5 +61,5 @@ tasks.test {
 }
 
 tasks.withType<BootJar>(){
-    archiveFileName.set("${project.name}.jar")
+    archiveFileName.set("category_service.jar")
 }

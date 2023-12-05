@@ -18,6 +18,8 @@ import org.example.service.transitional.IRule;
 import org.example.service.transitional.NodeChain;
 import org.example.service.transitional.ProductToBuy;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -53,6 +55,17 @@ public class ReportService implements IReportService {
     public ReportDTO getReport(UUID id) {
         Report report = reportRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("report"));
         return mapper.map(report, ReportDTO.class);
+    }
+
+    @Override
+    public Page<ReportDTO> getPage(Pageable pageable) {
+        Page<Report> pageOfReports = reportRepository.findAll(pageable);
+        return pageOfReports.map(report -> mapper.map(report, ReportDTO.class));
+    }
+
+    @Override
+    public void deleteAllReports() {
+        reportRepository.deleteAll();
     }
 
     private List<ReportData> formReportData() {

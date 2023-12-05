@@ -2,15 +2,16 @@ version: '3.5'
 services:
 
   postgres_db:
-    build: postgresql
+    image: postgres:15.3-alpine3.18
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
+      POSTGRES_DB: category_service
     networks:
       - services_ntwrk
 
   pgadmin:
-    build: postgresql/pgadmin
+    image: dpage/pgadmin4
     depends_on:
     - postgres_db
     environment:
@@ -71,17 +72,53 @@ services:
     environment:
       EUREKA_URI: ${EUREKA_URI}
 
+  keycloak:
+    image: jboss/keycloak
+    restart: on-failure
+    networks:
+      - services_ntwrk
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=postgres
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_ADDR=keycloak-db
+      - DB_PORT=5432
+      - DB_DATABASE=keycloakdb
+      - KEYCLOAK_IMPORT=/tmp/project_1c_realm.json
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./keycloak/project_1c_realm.json:/tmp/project_1c_realm.json
+    depends_on:
+      - keycloak-db
+
+  keycloak-db:
+    image: postgres:15.3-alpine3.18
+    networks:
+      - services_ntwrk
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: keycloakdb
+    volumes:
+      - keycloak_db_vlm:/var/lib/postgresql/data
+
   category_service:
     build: category_service
     depends_on:
       - postgres_db
       - gateway
       - config_server
+      - keycloak
     environment:
       spring.datasource.url: jdbc:postgresql://postgres_db:5432/category_service?ApplicationName=Category_Service
       spring.datasource.username: root
       spring.datasource.password: root
       spring.cloud.config.retry.max-attempts: 20
+      spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://keycloak:8080/auth/realms/project_1c/protocol/openid-connect/certs
+      paths.jwt.token-url: ${KEYCLOAK_TOKEN_URL}
       EUREKA_URI: ${EUREKA_URI}
     networks:
       - services_ntwrk
@@ -92,9 +129,12 @@ services:
       - mongo_db
       - gateway
       - config_server
+      - keycloak
     environment:
       spring.data.mongodb.uri: mongodb://${MONGO_ADMIN_USERNAME}:${MONGO_ADMIN_PASSWORD}@mongo_db:27017/project1c_db?authSource=admin
       spring.cloud.config.retry.max-attempts: 20
+      spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://keycloak:8080/auth/realms/project_1c/protocol/openid-connect/certs
+      paths.jwt.token-url: ${KEYCLOAK_TOKEN_URL}
       EUREKA_URI: ${EUREKA_URI}
     networks:
       - services_ntwrk
@@ -105,13 +145,19 @@ services:
       - mongo_db
       - gateway
       - config_server
+      - keycloak
     environment:
       spring.data.mongodb.uri: mongodb://${MONGO_ADMIN_USERNAME}:${MONGO_ADMIN_PASSWORD}@mongo_db:27017/project1c_db?authSource=admin
       spring.cloud.config.retry.max-attempts: 20
+      spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://keycloak:8080/auth/realms/project_1c/protocol/openid-connect/certs
+      paths.jwt.token-url: ${KEYCLOAK_TOKEN_URL}
       EUREKA_URI: ${EUREKA_URI}
     networks:
       - services_ntwrk
 
+volumes:
+  keycloak_db_vlm:
+    name: keycloak_db_vlm
 
 networks:
   services_ntwrk:
