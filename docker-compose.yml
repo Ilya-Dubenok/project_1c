@@ -2,15 +2,16 @@ version: '3.5'
 services:
 
   postgres_db:
-    build: postgresql
+    image: postgres:15.3-alpine3.18
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
+      POSTGRES_DB: category_service
     networks:
       - services_ntwrk
 
   pgadmin:
-    build: postgresql/pgadmin
+    image: dpage/pgadmin4
     depends_on:
     - postgres_db
     environment:
@@ -94,7 +95,7 @@ services:
       - keycloak-db
 
   keycloak-db:
-    image: postgres
+    image: postgres:15.3-alpine3.18
     networks:
       - services_ntwrk
     environment:
