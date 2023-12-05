@@ -59,5 +59,5 @@ tasks.withType<Test> {
 }
 
 tasks.withType<BootJar>(){
-    archiveFileName.set("${project.name}.jar")
+    archiveFileName.set("product_service.jar")
 }

@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    java
+    id("java")
     id("org.springframework.boot") version "3.1.5"
     id("io.spring.dependency-management") version "1.1.3"
 }
@@ -9,12 +9,12 @@ plugins {
 group = "org.example"
 version = "1"
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-}
-
 repositories {
     mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 extra["springCloudVersion"] = "2022.0.4"
@@ -31,10 +31,10 @@ dependencyManagement {
     }
 }
 
-tasks.withType<Test> {
+tasks.test {
     useJUnitPlatform()
 }
 
 tasks.withType<BootJar>(){
-    archiveFileName.set("${project.name}.jar")
+    archiveFileName.set("config_server.jar")
 }

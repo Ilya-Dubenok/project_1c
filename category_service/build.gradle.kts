@@ -61,5 +61,5 @@ tasks.test {
 }
 
 tasks.withType<BootJar>(){
-    archiveFileName.set("${project.name}.jar")
+    archiveFileName.set("category_service.jar")
 }
