@@ -81,6 +81,7 @@ services:
       spring.datasource.url: jdbc:postgresql://postgres_db:5432/category_service?ApplicationName=Category_Service
       spring.datasource.username: root
       spring.datasource.password: root
+      spring.cloud.config.retry.max-attempts: 20
       EUREKA_URI: ${EUREKA_URI}
     networks:
       - services_ntwrk
@@ -93,9 +94,24 @@ services:
       - config_server
     environment:
       spring.data.mongodb.uri: mongodb://${MONGO_ADMIN_USERNAME}:${MONGO_ADMIN_PASSWORD}@mongo_db:27017/project1c_db?authSource=admin
+      spring.cloud.config.retry.max-attempts: 20
       EUREKA_URI: ${EUREKA_URI}
     networks:
       - services_ntwrk
+
+  report_service:
+    build: report_service
+    depends_on:
+      - mongo_db
+      - gateway
+      - config_server
+    environment:
+      spring.data.mongodb.uri: mongodb://${MONGO_ADMIN_USERNAME}:${MONGO_ADMIN_PASSWORD}@mongo_db:27017/project1c_db?authSource=admin
+      spring.cloud.config.retry.max-attempts: 20
+      EUREKA_URI: ${EUREKA_URI}
+    networks:
+      - services_ntwrk
+
 
 networks:
   services_ntwrk:

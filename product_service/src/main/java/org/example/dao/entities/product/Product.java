@@ -19,7 +19,7 @@ import java.util.UUID;
 public class Product {
 
     @Id
-    private UUID uuid;
+    private UUID id;
 
     private UUID categoryId;
 

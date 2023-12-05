@@ -16,15 +16,15 @@ public class QuantityRule implements IRule{
 
     @Id
     @Column(name= "id")
-    private UUID uuid;
+    private UUID id;
 
     private Integer minimumQuantity;
 
     @Enumerated(EnumType.ORDINAL)
     private RuleType ruleType = RuleType.QUANT;
 
-    public QuantityRule(UUID uuid, Integer minimumQuantity) {
-        this.uuid = uuid;
+    public QuantityRule(UUID id, Integer minimumQuantity) {
+        this.id = id;
         this.minimumQuantity = minimumQuantity;
     }
 

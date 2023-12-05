@@ -18,7 +18,7 @@ public class CategoryCreateDTO {
     @NotBlank(message = "must not be null o blank")
     private String name;
 
-    private UUID parentUuid;
+    private UUID parentId;
 
     @Valid
     private List<RuleCreateDTO> rules;

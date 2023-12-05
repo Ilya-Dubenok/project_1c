@@ -38,7 +38,7 @@ public class ProductService implements IProductService {
     @Override
     public ProductDTO save(ProductCreateDTO productCreateDTO) {
         UUID categoryId = productCreateDTO.getCategoryId();
-        verifyCategoryUuid(categoryId);
+        verifyCategoryId(categoryId);
         Set<IRule> rules = formSetOfRules(productCreateDTO.getRules());
         List<Item> items = formListOfItems(productCreateDTO.getItems());
         Product product = new Product(UUID.randomUUID(), categoryId, productCreateDTO.getName(), rules, items);
@@ -46,49 +46,56 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductDTO findByUUID(UUID uuid) {
-        Product product = getProductOrThrow(uuid);
+    public ProductDTO findById(UUID id) {
+        Product product = getProductOrThrow(id);
         return mapper.map(product, ProductDTO.class);
     }
 
     @Override
     public ProductDTO findByName(String name) {
-        Product product = productRepository.findByName(name.toLowerCase()).orElseThrow(() -> new EntityNotFoundException("product"));
+        Product product = productRepository.findByNameIgnoreCase(name.toLowerCase()).orElseThrow(() -> new EntityNotFoundException("product"));
         return mapper.map(product, ProductDTO.class);
+    }
+
+    @Override
+    public List<ProductDTO> findAll() {
+        return productRepository.findAll().stream()
+                .map(product -> mapper.map(product, ProductDTO.class))
+                .toList();
     }
 
     @Override
     public Page<ProductDTO> getPage(Pageable pageable) {
         Page<Product> pageOfProducts = productRepository.findAll(pageable);
-        return pageOfProducts.map(category -> mapper.map(category, ProductDTO.class));
+        return pageOfProducts.map(product -> mapper.map(product, ProductDTO.class));
     }
 
     @Override
-    public ProductDTO updateName(UUID productUuid, String name) {
-        Product product = getProductOrThrow(productUuid);
+    public ProductDTO updateName(UUID productId, String name) {
+        Product product = getProductOrThrow(productId);
         product.setName(name);
         return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
     @Override
-    public ProductDTO updateRules(UUID productUuid, List<RuleDTO> ruleDTOList) {
-        Product product = getProductOrThrow(productUuid);
+    public ProductDTO updateRules(UUID productId, List<RuleDTO> ruleDTOList) {
+        Product product = getProductOrThrow(productId);
         Set<IRule> ruleSet = formSetOfRules(ruleDTOList);
         product.setRules(ruleSet);
         return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
     @Override
-    public ProductDTO updateItems(UUID productUuid, List<ItemDTO> itemDTOList) {
-        Product product = getProductOrThrow(productUuid);
+    public ProductDTO updateItems(UUID productId, List<ItemDTO> itemDTOList) {
+        Product product = getProductOrThrow(productId);
         List<Item> items = formListOfItems(itemDTOList);
         product.setItems(items);
         return mapper.map(productRepository.save(product), ProductDTO.class);
     }
 
     @Override
-    public ProductDTO addItem(UUID productUuid, ItemDTO itemDTO) {
-        Product product = getProductOrThrow(productUuid);
+    public ProductDTO addItem(UUID productId, ItemDTO itemDTO) {
+        Product product = getProductOrThrow(productId);
         Optional<Item> sameItemForExpiresAt = findItemFromProductWhichExpiresAt(product, itemDTO.getExpiresAt());
 
         sameItemForExpiresAt.ifPresentOrElse(
@@ -99,8 +106,8 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductDTO addToItemQuantity(UUID productUuid, LocalDate expiresAt, Integer summand) {
-        Product product = getProductOrThrow(productUuid);
+    public ProductDTO addToItemQuantity(UUID productId, LocalDate expiresAt, Integer summand) {
+        Product product = getProductOrThrow(productId);
         Item item = findItemFromProductWhichExpiresAt(product, expiresAt)
                 .orElseThrow(() -> new InternalException("no item found for this expiration date"));
 
@@ -114,8 +121,8 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductDTO changeItemExpirationDate(UUID productUuid, LocalDate expiresAt, LocalDate replacement) {
-        Product product = getProductOrThrow(productUuid);
+    public ProductDTO changeItemExpirationDate(UUID productId, LocalDate expiresAt, LocalDate replacement) {
+        Product product = getProductOrThrow(productId);
         Item item = findItemFromProductWhichExpiresAt(product, expiresAt)
                 .orElseThrow(() -> new InternalException("no item found for this expiration date"));
         item.setExpiresAt(replacement);
@@ -124,11 +131,11 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void delete(UUID productUuid) {
-        if (!productRepository.existsById(productUuid)) {
+    public void delete(UUID productId) {
+        if (!productRepository.existsById(productId)) {
             throw new EntityNotFoundException("product");
         }
-        productRepository.deleteById(productUuid);
+        productRepository.deleteById(productId);
     }
 
     private void mergeItemsWithSameExpirationDate(List<Item> items, Item probeItem) {
@@ -141,14 +148,14 @@ public class ProductService implements IProductService {
         }
     }
 
-    private void verifyCategoryUuid(UUID categoryId) {
+    private void verifyCategoryId(UUID categoryId) {
         if (!categoryClient.categoryExists(categoryId)) {
             throw new InternalException("specified category does not exist");
         }
     }
 
-    private Product getProductOrThrow(UUID productUuid) {
-        return productRepository.findById(productUuid).orElseThrow(() -> new EntityNotFoundException("product"));
+    private Product getProductOrThrow(UUID productId) {
+        return productRepository.findById(productId).orElseThrow(() -> new EntityNotFoundException("product"));
     }
 
     private List<Item> formListOfItems(List<ItemDTO> itemDTOList) {

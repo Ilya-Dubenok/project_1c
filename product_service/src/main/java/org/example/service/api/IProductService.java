@@ -15,23 +15,25 @@ public interface IProductService {
 
     ProductDTO save(ProductCreateDTO productCreateDTO);
 
-    ProductDTO findByUUID(UUID uuid);
+    ProductDTO findById(UUID id);
 
     ProductDTO findByName(String name);
 
+    List<ProductDTO> findAll();
+
     Page<ProductDTO> getPage(Pageable pageable);
 
-    ProductDTO updateName(UUID productUuid, String name);
+    ProductDTO updateName(UUID productId, String name);
 
-    ProductDTO updateRules(UUID productUuid, List<RuleDTO> ruleDTOList);
+    ProductDTO updateRules(UUID productId, List<RuleDTO> ruleDTOList);
 
-    ProductDTO updateItems(UUID productUuid, List<ItemDTO> itemDTOList);
+    ProductDTO updateItems(UUID productId, List<ItemDTO> itemDTOList);
 
-    ProductDTO addItem(UUID productUuid, ItemDTO itemDTO);
+    ProductDTO addItem(UUID productId, ItemDTO itemDTO);
 
-    ProductDTO addToItemQuantity(UUID productUuid, LocalDate expiresAt, Integer summand);
+    ProductDTO addToItemQuantity(UUID productId, LocalDate expiresAt, Integer summand);
 
-    ProductDTO changeItemExpirationDate(UUID productUuid, LocalDate expiresAt, LocalDate replacement);
+    ProductDTO changeItemExpirationDate(UUID productId, LocalDate expiresAt, LocalDate replacement);
 
-    void delete(UUID productUuid);
+    void delete(UUID productId);
 }

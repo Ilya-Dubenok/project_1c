@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: report-service
+
+  cloud:
+    config:
+      label: report_service,dev
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+      retry:
+        initial-interval: 2000
+        max-interval: 4000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    preferIpAddress: true
+

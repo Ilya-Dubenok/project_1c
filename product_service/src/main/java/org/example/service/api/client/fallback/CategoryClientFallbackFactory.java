@@ -17,7 +17,7 @@ public class CategoryClientFallbackFactory implements FallbackFactory<ICategoryC
         log.error("[FALLBACK] Could not reach category-service", cause);
         return new ICategoryClient() {
             @Override
-            public Boolean categoryExists(UUID categoryUuid) {
+            public Boolean categoryExists(UUID categoryId) {
                 throw new OtherServiceUnavailableException();
             }
         };
