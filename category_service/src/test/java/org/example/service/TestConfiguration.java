@@ -19,10 +19,11 @@ public class TestConfiguration {
             .withExposedPorts(8761);
 
     @Container
-    static GenericContainer<?> postgres = new GenericContainer<>("project_1c-postgres_db")
+    static GenericContainer<?> postgres = new GenericContainer<>("postgres:15.3-alpine3.18")
             .withExposedPorts(5432)
             .withEnv("POSTGRES_USER", "root")
-            .withEnv("POSTGRES_PASSWORD", "root");
+            .withEnv("POSTGRES_PASSWORD", "root")
+            .withEnv("POSTGRES_DB", "category_service");
 
     @Test
     public void test() {
