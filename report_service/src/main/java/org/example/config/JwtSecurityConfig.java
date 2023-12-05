@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
 
@@ -18,13 +19,15 @@ public class JwtSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(authorization ->
                 authorization
-                        .requestMatchers(HttpMethod.DELETE,"report/all")
+                        .requestMatchers(HttpMethod.DELETE,"/report/all")
                         .hasAnyAuthority("SCOPE_perform_all_operations")
-                        .requestMatchers("report-service/v3/api-docs")
+                        .requestMatchers("/report-service/v3/api-docs")
                         .permitAll()
                         .anyRequest()
-                        .authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+                        .authenticated()
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                .csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
 

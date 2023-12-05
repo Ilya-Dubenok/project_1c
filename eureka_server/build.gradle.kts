@@ -37,6 +37,6 @@ tasks.test {
 }
 
 tasks.withType<BootJar>(){
-    archiveFileName.set("${project.name}.jar")
+    archiveFileName.set("eureka_server.jar")
 }
 

@@ -40,7 +40,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.google.guava:guava:11.0.2")
     implementation("org.modelmapper:modelmapper:3.2.0")
+    implementation("org.liquibase:liquibase-core:4.25.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
@@ -48,7 +50,6 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter:1.18.3")
-
 }
 
 dependencyManagement {
@@ -63,5 +64,5 @@ tasks.test {
 }
 
 tasks.withType<BootJar>(){
-    archiveFileName.set("${project.name}.jar")
+    archiveFileName.set("category_service.jar")
 }
