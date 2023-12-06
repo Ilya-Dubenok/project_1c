@@ -7,8 +7,23 @@ spring:
     hikari:
       schema: app
 
+  cloud:
+    discovery:
+      enabled: false
+
   security:
     oauth2:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8180/auth/realms/project_1c/protocol/openid-connect/certs
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL:
+          DEBUG
+        orm:
+          jdbc:
+            bind:
+              Trace

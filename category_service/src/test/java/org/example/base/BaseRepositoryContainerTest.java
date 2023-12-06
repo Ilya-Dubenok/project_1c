@@ -1,6 +1,5 @@
-package org.example.service;
+package org.example.base;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -12,11 +11,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
-public class TestConfiguration {
+public abstract class BaseRepositoryContainerTest {
 
-    @Container
-    static GenericContainer<?> eureka = new GenericContainer<>("project_1c-eureka-server")
-            .withExposedPorts(8761);
 
     @Container
     static GenericContainer<?> postgres = new GenericContainer<>("postgres:15.3-alpine3.18")
@@ -25,16 +21,6 @@ public class TestConfiguration {
             .withEnv("POSTGRES_PASSWORD", "root")
             .withEnv("POSTGRES_DB", "category_service");
 
-    @Test
-    public void test() {
-    }
-
-    @DynamicPropertySource
-    static void eurekaProperties(DynamicPropertyRegistry registry) {
-        registry.add("eureka.client.service-url.defaultZone", () -> "http://%s:%d/eureka"
-                .formatted(eureka.getHost(), eureka.getFirstMappedPort()));
-        registry.add("eureka.client.instance.preferIpAddress", () -> "true");
-    }
 
     @DynamicPropertySource
     static void postgresProperties(DynamicPropertyRegistry registry) {
