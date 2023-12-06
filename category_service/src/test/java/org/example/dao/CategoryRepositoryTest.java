@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @SpringBootTest
 @DisplayName("Test Repository Methods")
-public class RepositoryTest extends BaseRepositoryContainerTest {
+public class CategoryRepositoryTest extends BaseRepositoryContainerTest {
 
 
     @Autowired
