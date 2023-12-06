@@ -21,7 +21,6 @@ import java.util.UUID;
 @DisplayName("Test Repository Methods")
 public class CategoryRepositoryTest extends BaseRepositoryContainerTest {
 
-
     @Autowired
     private ICategoryRepository categoryRepository;
 
@@ -82,5 +81,4 @@ public class CategoryRepositoryTest extends BaseRepositoryContainerTest {
         Assertions.assertEquals(1, listOfChildrenOfParent2.size());
         Assertions.assertEquals("child1OfParent2", listOfChildrenOfParent2.get(0).getName());
     }
-
 }
