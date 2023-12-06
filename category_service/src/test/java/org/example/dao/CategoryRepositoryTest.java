@@ -72,11 +72,11 @@ public class CategoryRepositoryTest extends BaseRepositoryContainerTest {
         Category child1OfParent1 = new Category(UUID.randomUUID(), "child1OfParent1", parent1, null);
         Category child2OfParent1 = new Category(UUID.randomUUID(), "child2OfParent1", parent1, null);
         Category child1OfParent2 = new Category(UUID.randomUUID(), "child1OfParent2", parent2, null);
-        categoryRepository.saveAll(List.of(child1OfParent1,child2OfParent1,child1OfParent2));
+        categoryRepository.saveAll(List.of(child1OfParent1, child2OfParent1, child1OfParent2));
 
         List<Category> listOfChildrenOfParent1 = categoryRepository.findByParent_IdEquals(parentUuid1);
         Assertions.assertEquals(2, listOfChildrenOfParent1.size());
-        Assertions.assertEquals(2,listOfChildrenOfParent1.stream().filter(category->!Objects.equals("child1OfParent2", category.getName())).count());
+        Assertions.assertEquals(2, listOfChildrenOfParent1.stream().filter(category -> !Objects.equals("child1OfParent2", category.getName())).count());
 
         List<Category> listOfChildrenOfParent2 = categoryRepository.findByParent_IdEquals(parentUuid2);
         Assertions.assertEquals(1, listOfChildrenOfParent2.size());
