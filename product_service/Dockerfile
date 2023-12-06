@@ -1,7 +1,7 @@
 FROM gradle:jdk17 as gradle
 COPY . /home/gradle/source
 WORKDIR /home/gradle/source
-RUN gradle build
+RUN gradle build -x test
 
 FROM eclipse-temurin:17
 RUN mkdir "/app"

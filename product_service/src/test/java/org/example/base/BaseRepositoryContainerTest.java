@@ -23,7 +23,7 @@ public abstract class BaseRepositoryContainerTest {
     }
 
     @DynamicPropertySource
-    public static void postgresProperties(DynamicPropertyRegistry registry) {
+    public static void mongoProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", () -> "mongodb://root:example@%s:%d/project1c_db?authSource=admin".formatted(mongoDB.getHost(), mongoDB.getFirstMappedPort()));
     }
 

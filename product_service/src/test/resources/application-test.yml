@@ -15,6 +15,14 @@ spring:
         jwt:
           jwk-set-uri: http://localhost:8180/auth/realms/project_1c/protocol/openid-connect/certs
 
+  cloud:
+    discovery:
+      client:
+        simple:
+          instances:
+            category-service[0]:
+              uri: http://localhost:9595
+
 eureka:
   client:
     enabled: false
