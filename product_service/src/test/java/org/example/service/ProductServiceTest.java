@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -70,15 +71,7 @@ public class ProductServiceTest extends BaseRepositoryContainerTest {
         ProductDTO savedProduct = productService.save(new ProductCreateDTO("name", UUID.randomUUID(), null, items));
         List<ItemDTO> savedItems = savedProduct.getItems();
         Assertions.assertEquals(2, savedItems.size());
-        long matchedSavedItems = savedItems.stream()
-                .filter(item -> {
-                    if (item.getExpiresAt().isEqual(LocalDate.now())) {
-                        return item.getQuantity().equals(10);
-                    } else {
-                        return item.getQuantity().equals(7);
-                    }
-                })
-                .count();
+        long matchedSavedItems = countItemsForDateQuantityAndRemainder(savedItems, LocalDate.now(), 10, 7);
         Assertions.assertEquals(2, matchedSavedItems);
     }
 
@@ -86,6 +79,54 @@ public class ProductServiceTest extends BaseRepositoryContainerTest {
     public void findByNameWorks() {
         productService.save(new ProductCreateDTO("name", UUID.randomUUID(), null, null));
         Assertions.assertEquals("name", productService.findByName("name").getName());
+    }
+
+
+    @Test
+    public void updateNameSimple() {
+        String oldName = "old name";
+        UUID savedProductId = productService.save(new ProductCreateDTO(oldName, UUID.randomUUID(), null, null)).getId();
+        String newName = "new name";
+        productService.updateName(savedProductId, newName);
+        Assertions.assertEquals(newName, productService.findById(savedProductId).getName());
+    }
+
+    @Test
+    public void updateNameWithConflict() {
+        String existingName = "existing name";
+        productService.save(new ProductCreateDTO(existingName, UUID.randomUUID(), null, null));
+        String newName = "new name";
+        ProductDTO anotherSavedProduct = productService.save(new ProductCreateDTO(newName, UUID.randomUUID(), null, null));
+        Assertions.assertThrows(DuplicateKeyException.class, () -> productService.updateName(anotherSavedProduct.getId(), existingName));
+    }
+
+    @Test
+    public void addItemSimple() {
+        UUID savedProductId = productService.save(new ProductCreateDTO("name", UUID.randomUUID(), null, null)).getId();
+        productService.addItem(savedProductId, new ItemDTO(3, LocalDate.now()));
+        productService.addItem(savedProductId, new ItemDTO(4, LocalDate.now().plus(1, ChronoUnit.DAYS)));
+        Assertions.assertEquals(2, productService.findById(savedProductId).getItems().size());
+    }
+
+    @Test
+    public void addItemWithOverlappingExpirationDate() {
+        UUID savedProductId = productService.save(new ProductCreateDTO("name", UUID.randomUUID(), null, null)).getId();
+        productService.addItem(savedProductId, new ItemDTO(5, LocalDate.now()));
+        productService.addItem(savedProductId, new ItemDTO(5, LocalDate.now()));
+        productService.addItem(savedProductId, new ItemDTO(7, LocalDate.now().plus(1, ChronoUnit.DAYS)));
+        List<ItemDTO> savedItems = productService.findById(savedProductId).getItems();
+        long matchedSavedItems = countItemsForDateQuantityAndRemainder(savedItems, LocalDate.now(), 10, 7);
+        Assertions.assertEquals(2, matchedSavedItems);
+    }
+
+    private static long countItemsForDateQuantityAndRemainder(List<ItemDTO> savedItems, LocalDate firstDate, int quantityForFirstDate, int remainder) {
+        return savedItems.stream().filter(item -> {
+            if (item.getExpiresAt().isEqual(firstDate)) {
+                return item.getQuantity().equals(quantityForFirstDate);
+            } else {
+                return item.getQuantity().equals(remainder);
+            }
+        }).count();
     }
 
 
