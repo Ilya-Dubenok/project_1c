@@ -45,7 +45,7 @@ public class ProductServiceTest extends BaseRepositoryContainerTest {
     @Test
     public void savingWithExistingCategoryIdSucceeds() {
         UUID categoryId = UUID.randomUUID();
-        Assertions.assertDoesNotThrow(() -> productService.save(new ProductCreateDTO("some name", categoryId, Collections.emptyList(), Collections.emptyList())));
+        Assertions.assertDoesNotThrow(() -> saveDefaultProduct());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class ProductServiceTest extends BaseRepositoryContainerTest {
 
     @Test
     public void findByNameWorks() {
-        productService.save(new ProductCreateDTO("name", UUID.randomUUID(), null, null));
+        saveDefaultProduct("name");
         Assertions.assertEquals("name", productService.findByName("name").getName());
     }
 
@@ -85,7 +85,7 @@ public class ProductServiceTest extends BaseRepositoryContainerTest {
     @Test
     public void updateNameSimple() {
         String oldName = "old name";
-        UUID savedProductId = productService.save(new ProductCreateDTO(oldName, UUID.randomUUID(), null, null)).getId();
+        UUID savedProductId = saveDefaultProduct(oldName).getId();
         String newName = "new name";
         productService.updateName(savedProductId, newName);
         Assertions.assertEquals(newName, productService.findById(savedProductId).getName());
@@ -94,29 +94,108 @@ public class ProductServiceTest extends BaseRepositoryContainerTest {
     @Test
     public void updateNameWithConflict() {
         String existingName = "existing name";
-        productService.save(new ProductCreateDTO(existingName, UUID.randomUUID(), null, null));
+        saveDefaultProduct(existingName);
         String newName = "new name";
-        ProductDTO anotherSavedProduct = productService.save(new ProductCreateDTO(newName, UUID.randomUUID(), null, null));
+        ProductDTO anotherSavedProduct = saveDefaultProduct(newName);
         Assertions.assertThrows(DuplicateKeyException.class, () -> productService.updateName(anotherSavedProduct.getId(), existingName));
     }
 
     @Test
     public void addItemSimple() {
-        UUID savedProductId = productService.save(new ProductCreateDTO("name", UUID.randomUUID(), null, null)).getId();
+        UUID savedProductId = saveDefaultProduct().getId();
         productService.addItem(savedProductId, new ItemDTO(3, LocalDate.now()));
         productService.addItem(savedProductId, new ItemDTO(4, LocalDate.now().plus(1, ChronoUnit.DAYS)));
         Assertions.assertEquals(2, productService.findById(savedProductId).getItems().size());
     }
 
     @Test
-    public void addItemWithOverlappingExpirationDate() {
-        UUID savedProductId = productService.save(new ProductCreateDTO("name", UUID.randomUUID(), null, null)).getId();
+    public void addItem_withOverlappingExpirationDate() {
+        UUID savedProductId = saveDefaultProduct().getId();
         productService.addItem(savedProductId, new ItemDTO(5, LocalDate.now()));
         productService.addItem(savedProductId, new ItemDTO(5, LocalDate.now()));
         productService.addItem(savedProductId, new ItemDTO(7, LocalDate.now().plus(1, ChronoUnit.DAYS)));
         List<ItemDTO> savedItems = productService.findById(savedProductId).getItems();
         long matchedSavedItems = countItemsForDateQuantityAndRemainder(savedItems, LocalDate.now(), 10, 7);
         Assertions.assertEquals(2, matchedSavedItems);
+    }
+
+    @Test
+    public void addToItemQuantity_whenNoItemsExist_Throws() {
+        UUID productId = saveDefaultProduct().getId();
+        Assertions.assertThrows(InternalException.class, () -> productService.addToItemQuantity(productId, LocalDate.now().plus(1, ChronoUnit.DAYS), 3));
+    }
+
+    @Test
+    public void addToItemQuantity_whenNoItemsFound_Throws() {
+        UUID productId = saveDefaultProduct().getId();
+        productService.addItem(productId, new ItemDTO(2, LocalDate.now()));
+        Assertions.assertThrows(InternalException.class, () -> productService.addToItemQuantity(productId, LocalDate.now().plus(1, ChronoUnit.DAYS), 3));
+    }
+
+    @Test
+    public void addToItemQuantity_withResultLessThenZero() {
+        UUID productId = saveDefaultProduct().getId();
+        LocalDate expiresAt = LocalDate.now();
+        productService.addItem(productId, new ItemDTO(2, expiresAt));
+        productService.addToItemQuantity(productId, expiresAt, -4);
+        Assertions.assertEquals(0, productService.findById(productId).getItems().size());
+    }
+
+    @Test
+    public void addToItemQuantity_withResultEqualToZero() {
+        UUID productId = saveDefaultProduct().getId();
+        LocalDate expiresAt = LocalDate.now();
+        productService.addItem(productId, new ItemDTO(2, expiresAt));
+        productService.addToItemQuantity(productId, expiresAt, -2);
+        Assertions.assertEquals(0, productService.findById(productId).getItems().size());
+    }
+
+    @Test
+    public void addToItemQuantity_withResultGreaterThanZero() {
+        UUID productId = saveDefaultProduct().getId();
+        LocalDate expiresAt = LocalDate.now();
+        productService.addItem(productId, new ItemDTO(5, expiresAt));
+        productService.addToItemQuantity(productId, expiresAt, -2);
+        ItemDTO itemDTO = getListOfStoredItemsForProduct(productId).get(0);
+        Assertions.assertEquals(3, itemDTO.getQuantity());
+    }
+
+    @Test
+    public void changeItemExpirationDateSimple() {
+        UUID productId = saveDefaultProduct().getId();
+        LocalDate expiresAt = LocalDate.now();
+        productService.addItem(productId, new ItemDTO(5, expiresAt));
+        LocalDate replacement = expiresAt.plus(1, ChronoUnit.DAYS);
+        productService.changeItemExpirationDate(productId, expiresAt, replacement);
+        ItemDTO itemDTO = getListOfStoredItemsForProduct(productId).get(0);
+        Assertions.assertEquals(replacement, itemDTO.getExpiresAt());
+    }
+
+    @Test
+    public void changeItemExpirationDate_withResultOverlap() {
+        UUID productId = saveDefaultProduct().getId();
+        LocalDate expiresAt = LocalDate.now();
+        productService.addItem(productId, new ItemDTO(3, expiresAt));
+        LocalDate secondExpiresAt = expiresAt.plus(1, ChronoUnit.DAYS);
+        productService.addItem(productId, new ItemDTO(7, secondExpiresAt));
+        productService.changeItemExpirationDate(productId, expiresAt, secondExpiresAt);
+        List<ItemDTO> itemsStored = getListOfStoredItemsForProduct(productId);
+        Assertions.assertEquals(1, itemsStored.size());
+        ItemDTO mergedItem = itemsStored.get(0);
+        Assertions.assertEquals(10, mergedItem.getQuantity());
+        Assertions.assertEquals(secondExpiresAt, mergedItem.getExpiresAt());
+    }
+
+    private ProductDTO saveDefaultProduct() {
+        return productService.save(new ProductCreateDTO("name", UUID.randomUUID(), null, null));
+    }
+
+    private ProductDTO saveDefaultProduct(String name) {
+        return productService.save(new ProductCreateDTO(name, UUID.randomUUID(), null, null));
+    }
+
+    private List<ItemDTO> getListOfStoredItemsForProduct(UUID productId) {
+        return productService.findById(productId).getItems();
     }
 
     private static long countItemsForDateQuantityAndRemainder(List<ItemDTO> savedItems, LocalDate firstDate, int quantityForFirstDate, int remainder) {
@@ -128,6 +207,4 @@ public class ProductServiceTest extends BaseRepositoryContainerTest {
             }
         }).count();
     }
-
-
 }
