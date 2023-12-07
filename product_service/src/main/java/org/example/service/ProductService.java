@@ -53,7 +53,7 @@ public class ProductService implements IProductService {
 
     @Override
     public ProductDTO findByName(String name) {
-        Product product = productRepository.findByNameIgnoreCase(name.toLowerCase()).orElseThrow(() -> new EntityNotFoundException("product"));
+        Product product = productRepository.findByName(name).orElseThrow(() -> new EntityNotFoundException("product"));
         return mapper.map(product, ProductDTO.class);
     }
 

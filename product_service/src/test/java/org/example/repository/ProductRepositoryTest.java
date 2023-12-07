@@ -27,15 +27,15 @@ public class ProductRepositoryTest extends BaseRepositoryContainerTest {
     }
 
     @Test
-    public void findByNameWithIgnoreCase() {
+    public void findByName() {
         String initName = "some name";
         repository.save(new Product(UUID.randomUUID(), UUID.randomUUID(), initName, null, null));
-        Optional<Product> optionalProduct = repository.findByNameIgnoreCase("SoME NaME");
+        Optional<Product> optionalProduct = repository.findByName("some name");
         Assertions.assertEquals(initName, optionalProduct.orElseThrow().getName());
     }
 
     @Test
-    public void saveForExistingNameThroes() {
+    public void saveForExistingNameThrows() {
         String sharedName = "some name";
         repository.save(new Product(UUID.randomUUID(), UUID.randomUUID(), sharedName, null, null));
         Assertions.assertThrows(DuplicateKeyException.class, () -> repository.save(new Product(UUID.randomUUID(), UUID.randomUUID(), sharedName, null, null)));
