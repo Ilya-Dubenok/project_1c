@@ -20,5 +20,6 @@ discriminatorMapping = {
 @NoArgsConstructor
 public abstract class RuleDTO {
 
+    public abstract RuleType getRuleType();
 
 }

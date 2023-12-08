@@ -50,6 +50,8 @@ dependencies {
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:junit-jupiter:1.18.3")
+    testImplementation("org.wiremock:wiremock:3.3.1")
+
 }
 
 dependencyManagement {
