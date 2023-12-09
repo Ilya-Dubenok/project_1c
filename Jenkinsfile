@@ -1,10 +1,12 @@
 pipeline {
     agent any
+    tools {
+        gradle 'default'
+    }
     stages {
         stage('build') {
             steps {
-                sh 'chmod +x gradlew'
-                sh './gradlew build --no-daemon'
+                sh 'gradle build --no-daemon'
             }
         }
     }
