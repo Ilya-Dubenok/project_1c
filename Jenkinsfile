@@ -4,7 +4,7 @@ pipeline {
         stage('build') {
             steps {
                 sh 'chmod +x gradlew'
-                sh './gradlew build'
+                sh './gradlew build --no-daemon'
             }
         }
     }
