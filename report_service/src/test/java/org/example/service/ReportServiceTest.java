@@ -13,7 +13,6 @@ import org.example.core.dto.rule.ExpirationRuleDTO;
 import org.example.core.dto.rule.QuantityRuleDTO;
 import org.example.core.dto.rule.RuleDTO;
 import org.example.core.dto.rule.RuleType;
-import org.example.dao.entities.Report;
 import org.example.dao.entities.ReportData;
 import org.example.dao.repository.IReportRepository;
 import org.example.service.api.IReportService;
@@ -52,7 +51,6 @@ public class ReportServiceTest extends BaseRepositoryContainerTest {
     @Autowired
     private ObjectMapper jacksonObjectMapper;
 
-
     private final Map<String, CategoryDTO> categoriesMap = new HashMap<>();
 
     private final Map<String, ProductDTO> productsMap = new HashMap<>();
@@ -71,7 +69,7 @@ public class ReportServiceTest extends BaseRepositoryContainerTest {
 
     @Test
     public void productList_withAllRulesInProduct() {
-        updateProductData("chicken", List.of(createItemWithQuantityAndExpiresAt(1, 2)), createListOfRulesWithForValues(2, 5));
+        updateProductData("chicken", List.of(createItem(1, 2)), createListOfRules(2, 5));
         List<ProductToBuyDTO> productsToBuyDTOList = reportService.getProductsToBuyDTO();
         ProductToBuyDTO productToBuyDTO = productsToBuyDTOList.get(0);
         Assertions.assertEquals(2, productToBuyDTO.getQuantity());
@@ -80,8 +78,8 @@ public class ReportServiceTest extends BaseRepositoryContainerTest {
 
     @Test
     public void productList_withSingleRuleFromProduct_andAnotherFromCategory() {
-        updateProductData("chicken", List.of(createItemWithQuantityAndExpiresAt(1, 2)), createListOfRulesWithForValues(2, null));
-        updateCategoryData("meat", createListOfRulesWithForValues(null, 5));
+        updateProductData("chicken", List.of(createItem(1, 2)), createListOfRules(2, null));
+        updateCategoryData("meat", createListOfRules(null, 5));
         List<ProductToBuyDTO> productsToBuyDTOList = reportService.getProductsToBuyDTO();
         ProductToBuyDTO productToBuyDTO = productsToBuyDTOList.get(0);
         Assertions.assertEquals(2, productToBuyDTO.getQuantity());
@@ -90,8 +88,8 @@ public class ReportServiceTest extends BaseRepositoryContainerTest {
 
     @Test
     public void productList_withNoRuleFromProduct_oneFromCategory() {
-        updateProductData("chicken", List.of(createItemWithQuantityAndExpiresAt(1, 2)));
-        updateCategoryData("meat", createListOfRulesWithForValues(null, 5));
+        updateProductData("chicken", List.of(createItem(1, 2)));
+        updateCategoryData("meat", createListOfRules(null, 5));
         List<ProductToBuyDTO> productsToBuyDTOList = reportService.getProductsToBuyDTO();
         ProductToBuyDTO productToBuyDTO = productsToBuyDTOList.get(0);
         Assertions.assertEquals(1, productToBuyDTO.getQuantity());
@@ -100,8 +98,8 @@ public class ReportServiceTest extends BaseRepositoryContainerTest {
 
     @Test
     public void productList_withNoRuleFromProduct_twoFromCategory() {
-        updateProductData("chicken", List.of(createItemWithQuantityAndExpiresAt(1, 2)));
-        updateCategoryData("meat", createListOfRulesWithForValues(2, 5));
+        updateProductData("chicken", List.of(createItem(1, 2)));
+        updateCategoryData("meat", createListOfRules(2, 5));
         List<ProductToBuyDTO> productsToBuyDTOList = reportService.getProductsToBuyDTO();
         ProductToBuyDTO productToBuyDTO = productsToBuyDTOList.get(0);
         Assertions.assertEquals(2, productToBuyDTO.getQuantity());
@@ -109,15 +107,54 @@ public class ReportServiceTest extends BaseRepositoryContainerTest {
     }
 
     @Test
-    public void formReportData() {
-        updateProductData("chicken", List.of(createItemWithQuantityAndExpiresAt(1, 2)), createListOfRulesWithForValues(2, 5));
+    public void reportDataPicksRootCategory() {
+        updateProductData("chicken", List.of(createItem(1, 2)), createListOfRules(2, 5));
         reportService.formReport();
         List<ReportData> data = repository.findAll().get(0).getData();
         Assertions.assertEquals(1, data.size());
         Assertions.assertEquals("food products", data.get(0).getCategory().getName());
     }
 
-    private void updateProductServerStubbing() {
+    private ItemDTO createItem(int quantity, int daysSinceCurrentDay) {
+        return new ItemDTO(quantity, LocalDate.now().plus(daysSinceCurrentDay, ChronoUnit.DAYS));
+    }
+
+    private List<RuleDTO> createListOfRules(Integer quantity, Integer daysTillExpiration) {
+        List<RuleDTO> rules = new ArrayList<>();
+        if (quantity != null && quantity > 0) {
+            rules.add(new QuantityRuleDTO(RuleType.QUANT, quantity));
+        }
+        if (daysTillExpiration != null && daysTillExpiration > 0) {
+            rules.add(new ExpirationRuleDTO(RuleType.EXP, daysTillExpiration));
+        }
+        return rules;
+    }
+
+    private void updateCategoryData(String categoryName, List<RuleDTO> rules) {
+        CategoryDTO categoryDTO = categoriesMap.get(categoryName);
+        categoryDTO.setRules(rules);
+        updateStubbingForCategory(categoryName);
+    }
+
+    private void updateProductData(String productName, List<ItemDTO> items) {
+        ProductDTO productDTO = productsMap.get(productName);
+        productDTO.setItems(items);
+        refreshProductServerStubbing();
+    }
+
+    private void updateProductData(String productName, List<ItemDTO> items, List<RuleDTO> rules) {
+        ProductDTO productDTO = productsMap.get(productName);
+        productDTO.setItems(items);
+        productDTO.setRules(rules);
+        refreshProductServerStubbing();
+    }
+
+    private void refreshDefaultStubbing() {
+        refreshProductServerStubbing();
+        refreshCategoryServerStubbing();
+    }
+
+    private void refreshProductServerStubbing() {
         try {
             productServer.stubFor(get(urlEqualTo("/internal/all_products"))
                     .willReturn(aResponse()
@@ -129,78 +166,60 @@ public class ReportServiceTest extends BaseRepositoryContainerTest {
         }
     }
 
-    private ItemDTO createItemWithQuantityAndExpiresAt(int quantity, int daysSinceCurrentDay) {
-        return new ItemDTO(quantity, LocalDate.now().plus(daysSinceCurrentDay, ChronoUnit.DAYS));
+    private void refreshCategoryServerStubbing() {
+        stubCategoryExistsRequest();
+        stubCategoryAndParentsRequestForAllCategories();
+        stubEmptyApplicableRulesForAllCategories();
     }
 
-    private List<RuleDTO> createListOfRulesWithForValues(Integer quantity, Integer daysTillExpiration) {
-        List<RuleDTO> rules = new ArrayList<>();
-        if (quantity != null && quantity > 0) {
-            rules.add(new QuantityRuleDTO(RuleType.QUANT, quantity));
-        }
-        if (daysTillExpiration != null && daysTillExpiration > 0) {
-            rules.add(new ExpirationRuleDTO(RuleType.EXP, daysTillExpiration));
-        }
-        return rules;
+    private void stubCategoryAndParentsRequestForAllCategories() {
+        categoriesMap.values().forEach(category -> {
+            try {
+                categoryServer.stubFor(get(urlMatching("/internal/category_and_parents/" + category.getId()))
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withBody(jacksonObjectMapper.writeValueAsString(getCategoryAndParents(category)))
+                                .withHeader("Content-Type", "application/json")));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-
-    private void updateCategoryData(String categoryName, List<RuleDTO> rules) {
-        CategoryDTO categoryDTO = categoriesMap.get(categoryName);
-        categoryDTO.setRules(rules);
+    private void stubEmptyApplicableRulesForAllCategories() {
         try {
-            updateCategoryServerStubbing(categoryName);
+            categoryServer.stubFor(get(urlMatching("/internal/applicable_rules/(.+)")).atPriority(500)
+                    .willReturn(aResponse()
+                            .withStatus(200)
+                            .withBody(jacksonObjectMapper.writeValueAsString(new ArrayList<>()))
+                            .withHeader("Content-Type", "application/json")));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void updateProductData(String productName, List<ItemDTO> items) {
-        ProductDTO productDTO = productsMap.get(productName);
-        productDTO.setItems(items);
-        updateProductServerStubbing();
-    }
-
-    private void updateProductData(String productName, List<ItemDTO> items, List<RuleDTO> rules) {
-        ProductDTO productDTO = productsMap.get(productName);
-        productDTO.setItems(items);
-        productDTO.setRules(rules);
-        updateProductServerStubbing();
-    }
-
-    private void refreshDefaultStubbing() {
-        updateProductServerStubbing();
-        updateGeneralCategoryServerStubbing();
-    }
-
-    private void updateGeneralCategoryServerStubbing() {
+    private void stubCategoryExistsRequest() {
         try {
             categoryServer.stubFor(get(urlMatching("/internal/exists/(.+)"))
                     .willReturn(aResponse()
                             .withStatus(200)
                             .withBody(jacksonObjectMapper.writeValueAsString(true))
                             .withHeader("Content-Type", "application/json")));
-
-            categoryServer.stubFor(get(urlMatching("/internal/applicable_rules/(.+)")).atPriority(500)
-                    .willReturn(aResponse()
-                            .withStatus(200)
-                            .withBody(jacksonObjectMapper.writeValueAsString(new ArrayList<>()))
-                            .withHeader("Content-Type", "application/json")));
-
-            categoriesMap.values().forEach(category -> {
-                try {
-                    categoryServer.stubFor(get(urlMatching("/internal/category_and_parents/" + category.getId()))
-                            .willReturn(aResponse()
-                                    .withStatus(200)
-                                    .withBody(jacksonObjectMapper.writeValueAsString(getCategoryAndParents(category)))
-                                    .withHeader("Content-Type", "application/json")));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void updateStubbingForCategory(String categoryName) {
+        try {
+            CategoryDTO category = categoriesMap.get(categoryName);
+            categoryServer.stubFor(get(urlPathEqualTo("/internal/applicable_rules/" + category.getId())).atPriority(5)
+                    .willReturn(aResponse()
+                            .withStatus(200)
+                            .withBody(jacksonObjectMapper.writeValueAsString(category.getRules()))
+                            .withHeader("Content-Type", "application/json")));
+        } catch (JsonProcessingException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
@@ -214,15 +233,6 @@ public class ReportServiceTest extends BaseRepositoryContainerTest {
             categoryDTO = parent;
         }
         return categoryDTOList;
-    }
-
-    private void updateCategoryServerStubbing(String categoryName) throws JsonProcessingException {
-        CategoryDTO category = categoriesMap.get(categoryName);
-        categoryServer.stubFor(get(urlPathEqualTo("/internal/applicable_rules/" + category.getId())).atPriority(5)
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withBody(jacksonObjectMapper.writeValueAsString(category.getRules()))
-                        .withHeader("Content-Type", "application/json")));
     }
 
     private void formBasicCategoryTrees() {
