@@ -1,9 +1,9 @@
 pipeline {
-    agent { docker { image 'gradle:jdk17' } }
+    agent any
     stages {
         stage('build') {
             steps {
-                sh 'gradle build'
+                sh './gradlew build'
             }
         }
     }
