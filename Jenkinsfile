@@ -4,7 +4,12 @@ pipeline {
         gradle 'default'
     }
     stages {
-        stage('test') {
+        stage('Cleanup') {
+            steps {
+                sh 'gradle clean'
+            }
+        }
+        stage('Testing') {
             steps {
                 sh 'gradle :eureka_server:test'
                 sh 'gradle :gateway:test'
@@ -13,6 +18,11 @@ pipeline {
                 sh 'gradle :product_service:test'
                 sh 'gradle :report_service:test'
                 junit '**/test-results/test/*.xml'
+            }
+        }
+        stage('Build jars') {
+            steps {
+                sh 'gradle build'
             }
         }
     }
