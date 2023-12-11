@@ -4,9 +4,9 @@ pipeline {
         gradle 'default'
     }
     stages {
-        stage('build') {
+        stage('test') {
             steps {
-                sh 'gradle build'
+                sh 'gradle clean test'
             }
         }
     }
