@@ -27,7 +27,7 @@ pipeline {
         }
         stage('Build images') {
             steps {
-                node {
+                script {
                     docker.build("eureka_server", "./eureka_server")
                 }
             }
