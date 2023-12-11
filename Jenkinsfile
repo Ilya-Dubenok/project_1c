@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('test') {
             steps {
-                sh 'gradle clean test'
+                sh 'gradle clean :category_service:test'
             }
         }
     }
