@@ -6,7 +6,13 @@ pipeline {
     stages {
         stage('test') {
             steps {
-                sh 'gradle clean :category_service:test'
+                sh 'gradle :eureka_server:test'
+                sh 'gradle :gateway:test'
+                sh 'gradle :config_server:test'
+                sh 'gradle :category_service:test'
+                sh 'gradle :product_service:test'
+                sh 'gradle :report_service:test'
+                junit '**/test-results/test/*.xml'
             }
         }
     }
