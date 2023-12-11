@@ -25,5 +25,12 @@ pipeline {
                 sh 'gradle build'
             }
         }
+        stage('Build images') {
+            steps {
+                node {
+                    docker.build("eureka_server", "./eureka_server")
+                }
+            }
+        }
     }
 }

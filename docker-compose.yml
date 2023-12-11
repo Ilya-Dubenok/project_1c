@@ -46,6 +46,7 @@ services:
       - services_ntwrk
 
   eureka-server:
+    image: eureka_server:0.1
     build: eureka_server
     ports:
       - "8761:8761"
@@ -53,6 +54,7 @@ services:
       - services_ntwrk
 
   gateway:
+    image: gateway:0.1
     build: gateway
     depends_on:
     - eureka-server
@@ -64,6 +66,7 @@ services:
       EUREKA_URI: ${EUREKA_URI}
 
   config_server:
+    image: config_server:0.1
     build: config_server
     depends_on:
     - eureka-server
@@ -106,6 +109,7 @@ services:
       - keycloak_db_vlm:/var/lib/postgresql/data
 
   category_service:
+    image: category_service:0.1
     build: category_service
     depends_on:
       - postgres_db
@@ -124,6 +128,7 @@ services:
       - services_ntwrk
 
   product_service:
+    image: product_service:0.1
     build: product_service
     depends_on:
       - mongo_db
@@ -140,6 +145,7 @@ services:
       - services_ntwrk
 
   report_service:
+    image: report_service:0.1
     build: report_service
     depends_on:
       - mongo_db
