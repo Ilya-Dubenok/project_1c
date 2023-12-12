@@ -55,5 +55,5 @@ pipeline {
 }
 
 def getVersion() {
-        env.EUREKA_VERSION = sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./eureka_server/build/info.txt', returnStdout: true)
+        env.EUREKA_VERSION=sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./eureka_server/build/info.txt', returnStdout: true)
 }
