@@ -30,7 +30,7 @@ pipeline {
         stage('Build images') {
             steps {
                 script {
-                    env.EUREKA_VERSION = 1
+//                    env.EUREKA_VERSION = 1
 
                     sh 'echo ${EUREKA_VERSION}'
 //                    getVersion("eureka_server")
@@ -43,7 +43,6 @@ pipeline {
 
 }
 
-//String getVersion(String build) {
-//    env.EUREKA_VERSION=sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./eureka_server/build/info.txt', returnStdout: true)
-//    return sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./'+build+'/build/info.txt', returnStdout: true)
-//}
+def getVersion(String build) {
+    env.EUREKA_VERSION=sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./eureka_server/build/info.txt', returnStdout: true)
+}
