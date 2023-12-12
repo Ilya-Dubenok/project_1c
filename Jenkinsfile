@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
 //                    env.EUREKA_VERSION = 1
-
+                    getVersion()
                     sh 'echo ${EUREKA_VERSION}'
 //                    getVersion("eureka_server")
                     docker.build("eureka_server:${env.EUREKA_VERSION}", "./eureka_server")
@@ -43,6 +43,6 @@ pipeline {
 
 }
 
-def getVersion(String build) {
+def getVersion() {
     env.EUREKA_VERSION=sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./eureka_server/build/info.txt', returnStdout: true)
 }
