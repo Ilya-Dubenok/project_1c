@@ -29,12 +29,12 @@ pipeline {
             steps {
                 script {
                     setAllVersions()
-                    docker.build("eureka_server:${env.CATEGORY_SERVICE_VERSION}", "./category_service")
-                    docker.build("eureka_server:${env.CONFIG_SERVER_VERSION}", "./config_server")
+                    docker.build("category_service:${env.CATEGORY_SERVICE_VERSION}", "./category_service")
+                    docker.build("config_server:${env.CONFIG_SERVER_VERSION}", "./config_server")
                     docker.build("eureka_server:${env.EUREKA_VERSION}", "./eureka_server")
-                    docker.build("eureka_server:${env.GATEWAY_VERSION}", "./gateway")
-                    docker.build("eureka_server:${env.PRODUCT_SERVICE_VERSION}", "./product_service")
-                    docker.build("eureka_server:${env.REPORT_SERVICE_VERSION}", "./report_service")
+                    docker.build("gateway:${env.GATEWAY_VERSION}", "./gateway")
+                    docker.build("product_service:${env.PRODUCT_SERVICE_VERSION}", "./product_service")
+                    docker.build("report_service:${env.REPORT_SERVICE_VERSION}", "./report_service")
                 }
             }
         }
