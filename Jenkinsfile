@@ -25,12 +25,12 @@ pipeline {
                 sh 'gradle :eureka_server:build'
 //                sh 'gradle build'
                 println getVersion("eureka_server")
-                sh 'echo ${EUREKA_VERSION}'
             }
         }
         stage('Build images') {
             steps {
                 script {
+                    sh 'echo ${EUREKA_VERSION}'
                     docker.build("eureka_server:${EUREKA_VERSION}", "./eureka_server")
                 }
             }
