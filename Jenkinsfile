@@ -31,7 +31,9 @@ pipeline {
         stage('Build images') {
             steps {
                 environment {
-                    EUREKA_VERSION = getVersion("eureka_server")
+                    script {
+                        EUREKA_VERSION = getVersion("eureka_server")
+                    }
                 }
                 script {
                     sh "echo ${env.EUREKA_VERSION}"
