@@ -25,7 +25,7 @@ pipeline {
                 sh 'gradle build'
             }
         }
-        stage('Build and bush images') {
+        stage('Build and push images') {
             steps {
                 script {
                     setAllVersions()
@@ -37,6 +37,15 @@ pipeline {
                         productServiceImage = docker.build("dubenokilya/product_service:${env.PRODUCT_SERVICE_VERSION}", "./product_service").push()
                         reportServiceImage = docker.build("dubenokilya/report_service:${env.REPORT_SERVICE_VERSION}", "./report_service").push()
                     }
+                }
+            }
+        }
+
+        stage('Clean up space') {
+            steps {
+                script {
+                    sh 'docker rmi $(docker image ls | grep - P \'dubenokilya/\' | awk \'{ print $3 }\')'
+                    sh 'docker rmi $(docker images -f dangling=true -q)'
                 }
             }
         }
