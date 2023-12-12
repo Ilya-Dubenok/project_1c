@@ -30,7 +30,9 @@ pipeline {
 
         stage('setup env') {
             steps {
-                script getVersion()
+                script {
+                    getVersion()
+                }
             }
         }
 
