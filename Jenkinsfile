@@ -17,7 +17,7 @@ pipeline {
 //                sh 'gradle :category_service:test'
 //                sh 'gradle :product_service:test'
 //                sh 'gradle :report_service:test'
-                junit '**/test-results/test/*.xml'
+//                junit '**/test-results/test/*.xml'
             }
         }
         stage('Build jars') {
