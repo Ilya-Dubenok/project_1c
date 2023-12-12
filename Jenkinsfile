@@ -40,11 +40,12 @@ pipeline {
             }
         }
         stage("Push images") {
-            steps
+            steps{
                 script{
                     docker.withRegistry('', 'docker_cred')
                     categoryServiceImage.push()
                 }
+            }
         }
     }
 }
