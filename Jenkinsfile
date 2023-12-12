@@ -36,7 +36,7 @@ pipeline {
                     }
                     sh 'echo ${env.EUREKA_VERSION}'
 //                    getVersion("eureka_server")
-                    docker.build("eureka_server:${EUREKA_VERSION}", "./eureka_server")
+                    docker.build("eureka_server:${env.EUREKA_VERSION}", "./eureka_server")
                 }
             }
         }
