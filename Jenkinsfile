@@ -27,13 +27,13 @@ pipeline {
                 println getVersion("eureka_server")
             }
         }
-//        stage('Build images') {
-//            steps {
-//                script {
-//                    docker.build("eureka_server", "./eureka_server")
-//                }
-//            }
-//        }
+        stage('Build images') {
+            steps {
+                script {
+                    docker.build("eureka_server:"+getVersion("eureka_server"), "./eureka_server")
+                }
+            }
+        }
     }
 
 
