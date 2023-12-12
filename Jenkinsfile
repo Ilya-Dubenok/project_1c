@@ -24,8 +24,7 @@ pipeline {
             steps {
                 sh 'gradle :eureka_server:build'
 //                sh 'gradle build'
-                version = getVersion()
-                println version
+                println getVersion()
             }
         }
 //        stage('Build images') {
