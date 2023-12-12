@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
                     sh 'echo ${EUREKA_VERSION}'
-                    docker.build("eureka_server:1${EUREKA_VERSION}", "./eureka_server")
+                    docker.build("eureka_server:1${env.EUREKA_VERSION}", "./eureka_server")
                 }
             }
         }
