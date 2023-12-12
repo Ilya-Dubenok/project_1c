@@ -29,12 +29,10 @@ pipeline {
         }
 
         stage('Build images') {
+            environment {
+                EUREKA_VERSION = getVersion("eureka_server")
+            }
             steps {
-                environment {
-                    script {
-                        env.EUREKA_VERSION = getVersion("eureka_server")
-                    }
-                }
                 script {
                     sh "echo ${env.EUREKA_VERSION}"
                     docker.build("eureka_server:${env.EUREKA_VERSION}", "./eureka_server")
