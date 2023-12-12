@@ -4,7 +4,7 @@ pipeline {
         gradle 'default'
     }
     stages {
-        stage('Cleanup') {
+        stage('Clean up gradle') {
             steps {
                 sh 'gradle clean'
             }
@@ -40,12 +40,14 @@ pipeline {
                 }
             }
         }
-
         stage('Clean up space') {
             steps {
                 script {
-                    sh 'docker rmi $(docker image ls | grep - P \'dubenokilya/\' | awk \'{ print $3 }\')'
-                    sh 'docker rmi $(docker images -f dangling=true -q)'
+                    try {
+                        sh 'docker rmi $(docker image ls | grep -P \'dubenokilya/\' | awk \'{ print $3 }\')'
+                        sh 'docker rmi $(docker images -f dangling=true -q)'
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }
