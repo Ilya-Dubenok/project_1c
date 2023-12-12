@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "org.example"
-version = "1"
+version = "0.1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -63,4 +63,10 @@ tasks.withType<Test> {
 
 tasks.withType<BootJar>(){
     archiveFileName.set("product_service.jar")
+}
+
+tasks.named("build") {
+    doLast {
+        file("./build/info.txt").writeText("build_version=$version")
+    }
 }

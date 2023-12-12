@@ -12,36 +12,39 @@ pipeline {
         stage('Testing') {
             steps {
                 sh 'gradle :eureka_server:test'
-//                sh 'gradle :gateway:test'
-//                sh 'gradle :config_server:test'
-//                sh 'gradle :category_service:test'
-//                sh 'gradle :product_service:test'
-//                sh 'gradle :report_service:test'
-//                junit '**/test-results/test/*.xml'
+                sh 'gradle :gateway:test'
+                sh 'gradle :config_server:test'
+                sh 'gradle :category_service:test'
+                sh 'gradle :product_service:test'
+                sh 'gradle :report_service:test'
+                junit '**/test-results/test/*.xml'
             }
         }
         stage('Build jars') {
             steps {
-                sh 'gradle :eureka_server:build'
-//                sh 'gradle build'
-//                println getVersion("eureka_server")
+                sh 'gradle build'
             }
         }
-
         stage('Build images') {
             steps {
                 script {
-                    env.EUREKA_VERSION = getVersion("eureka_server")
-                    sh "echo ${env.EUREKA_VERSION}"
+                    setAllVersions()
                     docker.build("eureka_server:${env.EUREKA_VERSION}", "./eureka_server")
                 }
             }
         }
     }
-
-
 }
 
-Integer getVersion(String directory) {
-    return sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./' + directory + '/build/info.txt', returnStdout: true)
+def setAllVersions() {
+    env.EUREKA_VERSION = getVersion("category_service")
+    env.EUREKA_VERSION = getVersion("config_server")
+    env.EUREKA_VERSION = getVersion("eureka_server")
+    env.EUREKA_VERSION = getVersion("gateway")
+    env.EUREKA_VERSION = getVersion("product_service")
+    env.EUREKA_VERSION = getVersion("report_service")
+}
+
+String getVersion(String directory) {
+    return sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./'+directory+'/build/info.txt', returnStdout: true).trim()
 }

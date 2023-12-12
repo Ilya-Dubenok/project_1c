@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "org.example"
-version = "1"
+version = "0.1"
 
 repositories {
     mavenCentral()
@@ -37,4 +37,10 @@ tasks.test {
 
 tasks.withType<BootJar>(){
     archiveFileName.set("config_server.jar")
+}
+
+tasks.named("build") {
+    doLast {
+        file("./build/info.txt").writeText("build_version=$version")
+    }
 }
