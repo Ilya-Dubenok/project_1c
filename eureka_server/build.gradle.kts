@@ -40,3 +40,9 @@ tasks.withType<BootJar>(){
     archiveFileName.set("eureka_server.jar")
 }
 
+tasks.named("build") {
+    doLast {
+        file("./build/info.txt").writeText("build_version=$version")
+    }
+}
+
