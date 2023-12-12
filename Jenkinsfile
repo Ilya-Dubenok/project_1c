@@ -30,7 +30,7 @@ pipeline {
         stage('Build images') {
             steps {
                 script {
-                    docker.build("eureka_server:"+getVersion("eureka_server"), "./eureka_server")
+                    docker.build('eureka_server:0.'+getVersion("eureka_server"), "./eureka_server")
                 }
             }
         }
