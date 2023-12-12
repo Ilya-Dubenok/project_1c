@@ -44,7 +44,6 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'echo test'
                         sh 'docker rmi $(docker image ls | grep -P \'dubenokilya/\' | awk \'{ print $3 }\')'
                         sh 'docker rmi $(docker images -f dangling=true -q)'
                     } catch (Exception ignored) {
