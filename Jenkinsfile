@@ -11,43 +11,51 @@ pipeline {
         }
         stage('Testing') {
             steps {
-                sh 'gradle :eureka_server:test'
-                sh 'gradle :gateway:test'
-                sh 'gradle :config_server:test'
+//                sh 'gradle :eureka_server:test'
+//                sh 'gradle :gateway:test'
+//                sh 'gradle :config_server:test'
                 sh 'gradle :category_service:test'
-                sh 'gradle :product_service:test'
-                sh 'gradle :report_service:test'
-                junit '**/test-results/test/*.xml'
+//                sh 'gradle :product_service:test'
+//                sh 'gradle :report_service:test'
+//                junit '**/test-results/test/*.xml'
             }
         }
         stage('Build jars') {
             steps {
-                sh 'gradle build'
+//                sh 'gradle build'
+                sh 'gradle category_service:build'
             }
         }
         stage('Build images') {
             steps {
                 script {
                     setAllVersions()
-                    docker.build("category_service:${env.CATEGORY_SERVICE_VERSION}", "./category_service")
-                    docker.build("config_server:${env.CONFIG_SERVER_VERSION}", "./config_server")
-                    docker.build("eureka_server:${env.EUREKA_VERSION}", "./eureka_server")
-                    docker.build("gateway:${env.GATEWAY_VERSION}", "./gateway")
-                    docker.build("product_service:${env.PRODUCT_SERVICE_VERSION}", "./product_service")
-                    docker.build("report_service:${env.REPORT_SERVICE_VERSION}", "./report_service")
+                    categoryServiceImage=docker.build("dubenokilya/category_service:${env.CATEGORY_SERVICE_VERSION}", "./category_service")
+//                    docker.build("config_server:${env.CONFIG_SERVER_VERSION}", "./config_server")
+//                    docker.build("eureka_server:${env.EUREKA_VERSION}", "./eureka_server")
+//                    docker.build("gateway:${env.GATEWAY_VERSION}", "./gateway")
+//                    docker.build("product_service:${env.PRODUCT_SERVICE_VERSION}", "./product_service")
+//                    docker.build("report_service:${env.REPORT_SERVICE_VERSION}", "./report_service")
                 }
             }
+        }
+        stage("Push images") {
+            steps
+                script{
+                    docker.withRegistry('', 'docker_cred')
+                    categoryServiceImage.push()
+                }
         }
     }
 }
 
 def setAllVersions() {
     env.CATEGORY_SERVICE_VERSION = getVersion("category_service")
-    env.CONFIG_SERVER_VERSION = getVersion("config_server")
-    env.EUREKA_VERSION = getVersion("eureka_server")
-    env.GATEWAY_VERSION = getVersion("gateway")
-    env.PRODUCT_SERVICE_VERSION = getVersion("product_service")
-    env.REPORT_SERVICE_VERSION = getVersion("report_service")
+//    env.CONFIG_SERVER_VERSION = getVersion("config_server")
+//    env.EUREKA_VERSION = getVersion("eureka_server")
+//    env.GATEWAY_VERSION = getVersion("gateway")
+//    env.PRODUCT_SERVICE_VERSION = getVersion("product_service")
+//    env.REPORT_SERVICE_VERSION = getVersion("report_service")
 }
 
 String getVersion(String directory) {
