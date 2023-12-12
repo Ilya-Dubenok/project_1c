@@ -24,7 +24,7 @@ pipeline {
             steps {
                 sh 'gradle :eureka_server:build'
 //                sh 'gradle build'
-                println getVersion()
+                println getVersion("eureka_server")
             }
         }
 //        stage('Build images') {
@@ -39,6 +39,6 @@ pipeline {
 
 }
 
-String getVersion() {
-    return sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./build/info.txt', returnStdout: true)
+String getVersion(String build) {
+    return sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./'+build+'/build/info.txt', returnStdout: true)
 }
