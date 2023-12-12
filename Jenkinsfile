@@ -44,6 +44,6 @@ pipeline {
 
 }
 
-def getVersion(String directory) {
+String getVersion(String directory) {
     return sh(script: 'grep -oP \'build_version=\\K[^ ]+\' ./' + directory + '/build/info.txt', returnStdout: true)
 }
