@@ -32,7 +32,7 @@ pipeline {
             steps {
                 environment {
                     script {
-                        EUREKA_VERSION = getVersion("eureka_server")
+                        env.EUREKA_VERSION = getVersion("eureka_server")
                     }
                 }
                 script {
