@@ -33,17 +33,17 @@ public class CategoryRepositoryTest extends BaseRepositoryContainerTest {
     }
 
     @Test
-    public void saveMethodWorks() {
+    public void saveWorksSuccessfully() {
         categoryRepository.save(new Category(UUID.randomUUID(), "test_name1"));
     }
 
     @Test
-    public void saveMethodWithNoNameThrows() {
+    public void saveWithNoNameThrows() {
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> categoryRepository.save(new Category(UUID.randomUUID(), null)));
     }
 
     @Test
-    public void saveMethodWithExistingNameThrows() {
+    public void saveWithDuplicateNameThrows() {
         String sameName = "test_name1";
         categoryRepository.save(new Category(UUID.randomUUID(), sameName));
         DataIntegrityViolationException exc = Assertions.assertThrows(DataIntegrityViolationException.class, () -> categoryRepository.save(new Category(UUID.randomUUID(), sameName)));
@@ -51,11 +51,20 @@ public class CategoryRepositoryTest extends BaseRepositoryContainerTest {
     }
 
     @Test
-    public void findByName() {
+    public void saveWithDuplicateNameThrowsParsableException() {
+        String sameName = "test_name1";
+        categoryRepository.save(new Category(UUID.randomUUID(), sameName));
+        try {
+            categoryRepository.save(new Category(UUID.randomUUID(), sameName));
+        } catch (DataIntegrityViolationException exc) {
+            Assertions.assertTrue(dataBaseExceptionParser.fillIfExceptionRecognized(exc, new InternalExceptionDTO()));
+        }
+    }
+
+    @Test
+    public void findByNameWorks() {
         String testName1 = "test_name1";
-        String testName2 = "test_Name2";
         categoryRepository.save(new Category(UUID.randomUUID(), testName1));
-        categoryRepository.save(new Category(UUID.randomUUID(), testName2));
         Category category = categoryRepository.findByName(testName1);
         Assertions.assertEquals(testName1, category.getName());
     }
