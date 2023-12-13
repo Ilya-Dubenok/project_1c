@@ -8,6 +8,6 @@ import java.util.UUID;
 
 public interface IProductRepository extends MongoRepository<Product, UUID> {
 
-    Optional<Product> findByNameIgnoreCase(String name);
+    Optional<Product> findByName(String name);
 
 }

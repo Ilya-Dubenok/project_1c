@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NoArgsConstructor;
+import org.example.dao.entities.product.RuleType;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "rule_type")
 @JsonSubTypes({
@@ -20,5 +21,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public abstract class RuleDTO {
 
+    public abstract RuleType getRuleType();
 
 }

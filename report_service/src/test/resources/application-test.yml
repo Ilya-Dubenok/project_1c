@@ -1,0 +1,30 @@
+spring:
+  data:
+    mongodb:
+      uri: "mongodb://root:example@localhost:27017/project1c_db?authSource=admin"
+      uuid-representation: standard
+      auto-index-creation: true
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8180/auth/realms/project_1c/protocol/openid-connect/certs
+
+  cloud:
+    discovery:
+      client:
+        simple:
+          instances:
+            category-service[0]:
+              uri: http://localhost:9595
+            product-service[0]:
+              uri: http://localhost:9599
+
+eureka:
+  client:
+    enabled: false

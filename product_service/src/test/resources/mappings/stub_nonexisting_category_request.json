@@ -1,0 +1,13 @@
+{
+  "request": {
+    "urlPathPattern": "/internal/exists/af849fc5-74af-43fd-9a3c-adb8270522e8",
+    "method": "GET"
+  },
+  "response": {
+    "status": 200,
+    "body": "false",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

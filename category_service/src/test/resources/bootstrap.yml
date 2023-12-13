@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: category-service
+
+  liquibase:
+    default-schema: public
+
+  cloud:
+    config:
+      enabled: false
