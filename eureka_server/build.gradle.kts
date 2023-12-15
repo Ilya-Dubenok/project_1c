@@ -5,6 +5,7 @@ plugins {
     id("org.springframework.boot") version "3.1.4"
     id("io.spring.dependency-management") version "1.1.3"
     id("org.sonarqube") version "4.4.1.3373"
+    jacoco
 }
 
 group = "org.example"
@@ -20,8 +21,14 @@ java {
 
 sonar {
     properties {
-        property("sonar.projectName", "eureka_server")
-        property("sonar.projectKey", "org:example:project_1c")
+        property("sonar.projectName", "project_1c_eureka_server")
+        property("sonar.projectKey", "org:example:eureka_server")
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.value(true)
     }
 }
 

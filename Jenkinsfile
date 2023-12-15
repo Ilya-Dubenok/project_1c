@@ -9,16 +9,22 @@ pipeline {
                 sh 'gradle clean'
             }
         }
+        stage('Compile') {
+            steps {
+                sh 'gradle compileTestJava'
+            }
+        }
         stage('Testing') {
             steps {
                 sh 'gradle test'
+                sh 'gradle jacocoTestReport'
                 junit '**/test-results/test/*.xml'
             }
         }
         stage('Submit for Sonar verification'){
             steps {
                 withSonarQubeEnv("sonarqube1") {
-                    sh 'gradle sonar'
+                    sh 'gradle sonar -D sonar.gradle.skipCompile=true'
                 }
             }
         }
