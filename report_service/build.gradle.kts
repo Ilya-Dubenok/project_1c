@@ -17,8 +17,8 @@ java {
 
 sonar {
     properties {
-        property("sonar.projectName", "project_1c")
-        property("sonar.projectKey", "org:example:report_service")
+        property("sonar.projectName", "report_service")
+        property("sonar.projectKey", "org:example:project_1c")
     }
 }
 
