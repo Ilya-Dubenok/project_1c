@@ -4,6 +4,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.1.5"
     id("io.spring.dependency-management") version "1.1.3"
+    id("org.sonarqube") version "4.4.1.3373"
 }
 
 group = "org.example"
@@ -11,6 +12,13 @@ version = "0.1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
+}
+
+sonar {
+    properties {
+        property("sonar.projectName", "gateway")
+        property("sonar.projectKey", "org:example:project_1c")
+    }
 }
 
 repositories {

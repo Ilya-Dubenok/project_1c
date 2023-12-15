@@ -4,6 +4,7 @@ plugins {
     id("java")
     id("org.springframework.boot") version "3.1.4"
     id("io.spring.dependency-management") version "1.1.3"
+    id("org.sonarqube") version "4.4.1.3373"
 }
 
 group = "org.example"
@@ -15,6 +16,13 @@ repositories {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
+}
+
+sonar {
+    properties {
+        property("sonar.projectName", "eureka_server")
+        property("sonar.projectKey", "org:example:project_1c")
+    }
 }
 
 extra["springCloudVersion"] = "2022.0.4"

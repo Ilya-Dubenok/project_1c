@@ -15,6 +15,20 @@ pipeline {
                 junit '**/test-results/test/*.xml'
             }
         }
+        stage('Submit for Sonar verification'){
+            steps {
+                withSonarQubeEnv("sonarqube1") {
+                    sh 'gradle sonar'
+                }
+            }
+        }
+        stage('Quality Gate from Sonar'){
+            steps {
+                timeout(time: 5, unit: 'MINUTES'){
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
         stage('Build jars') {
             steps {
                 sh 'gradle build'
