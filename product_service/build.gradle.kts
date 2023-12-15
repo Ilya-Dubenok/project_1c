@@ -19,6 +19,7 @@ sonar {
     properties {
         property("sonar.projectName", "product_service")
         property("sonar.projectKey", "org:example:project_1c")
+        property("sonar.gradle.skipCompile", true)
     }
 }
 
