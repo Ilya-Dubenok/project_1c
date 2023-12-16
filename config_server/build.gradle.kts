@@ -4,10 +4,12 @@ plugins {
     id("java")
     id("org.springframework.boot") version "3.1.5"
     id("io.spring.dependency-management") version "1.1.3"
+    id("org.sonarqube") version "4.4.1.3373"
+    jacoco
 }
 
 group = "org.example"
-version = "1"
+version = "0.1"
 
 repositories {
     mavenCentral()
@@ -15,6 +17,19 @@ repositories {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
+}
+
+sonar {
+    properties {
+        property("sonar.projectName", "project_1c_config_server")
+        property("sonar.projectKey", "org:example:config_server")
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.value(true)
+    }
 }
 
 extra["springCloudVersion"] = "2022.0.4"
@@ -37,4 +52,10 @@ tasks.test {
 
 tasks.withType<BootJar>(){
     archiveFileName.set("config_server.jar")
+}
+
+tasks.named("build") {
+    doLast {
+        file("./build/info.txt").writeText("build_version=$version")
+    }
 }
