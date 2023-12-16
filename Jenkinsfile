@@ -4,19 +4,9 @@ pipeline {
         gradle 'default'
     }
     stages {
-        stage('Clean up gradle') {
-            steps {
-                sh 'gradle clean'
-            }
-        }
-        stage('Compile') {
-            steps {
-                sh 'gradle compileTestJava'
-            }
-        }
         stage('Testing') {
             steps {
-                sh 'gradle test'
+                sh 'gradle clean test'
                 sh 'gradle jacocoTestReport'
                 junit '**/test-results/test/*.xml'
             }
