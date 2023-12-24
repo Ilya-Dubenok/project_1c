@@ -23,5 +23,6 @@ jobs:
         uses: distributhor/workflow-webhook@v3
         with:
           webhook_url: http://82.97.240.173:8080/github-webhook/
+          verbose: true
 
         
