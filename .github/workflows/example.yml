@@ -26,7 +26,7 @@ jobs:
           verbose: true
           # event_name: 'pull_request'
           # verify_ssl: false
-          # webhook_type: 'form-urlencoded'
+          webhook_type: 'json-extended'
           # curl_opts: '--data "{}"'
 
         
